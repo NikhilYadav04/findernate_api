@@ -39,7 +39,7 @@ class _OnboardRootScreenState extends State<OnboardRootScreen> {
                     curve: Curves.easeInOut,
                   );
                 } else {
-                  Navigator.pushNamed(context, '/register-phone');
+                  Navigator.pushNamed(context, '/personal-info-1');
                 }
               },
               onTapSkip: () {

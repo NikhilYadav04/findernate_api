@@ -17,6 +17,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NetworkProvider()),
         ChangeNotifierProvider(create: (_) => ProviderSignIn()),
         ChangeNotifierProvider(create: (_) => ProviderRegister()),
+        ChangeNotifierProvider(create: (_) => ProviderRegister()),
+        ChangeNotifierProvider(create: (_) => ProviderAuth()),
         ChangeNotifierProvider(create: (_) => Dummy()),
       ],
       child: MaterialApp(

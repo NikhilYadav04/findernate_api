@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:social_media_clone/core/constants/appColors.dart';
 
 import 'package:social_media_clone/view/onboarding/widgets/onboard_widgets.dart';
 
@@ -107,19 +107,37 @@ class OnboardBoilerPlate extends StatelessWidget {
                                     text: 'Already have an account? ',
                                     style: _style.copyWith(
                                         color: Colors.black,
-                                        fontSize: constraints.maxHeight * 0.021,
+                                        fontSize: constraints.maxHeight * 0.019,
                                         fontWeight: FontWeight.bold),
                                     children: [
-                                      TextSpan(
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            // Navigate on tap
-                                            Navigator.pushNamed(
-                                                context, '/sign-in');
-                                          },
-                                        text: 'Sign In',
-                                        style: _style.copyWith(
-                                          color: Colors.grey.shade700,
+                                      WidgetSpan(
+                                        child: GestureDetector(
+                                          onTap: onTap,
+                                          child: ShaderMask(
+                                            shaderCallback: (bounds) =>
+                                                LinearGradient(
+                                              colors: [
+                                                AppColors.appGradient1,
+                                                AppColors.appGradient2,
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ).createShader(
+                                              Rect.fromLTWH(0, 0, bounds.width,
+                                                  bounds.height),
+                                            ),
+                                            child: Text(
+                                              'Sign In',
+                                              style: _style.copyWith(
+                                                color: Colors
+                                                    .white, // Ignored due to shader
+                                                fontSize:
+                                                    constraints.maxHeight *
+                                                        0.019,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],

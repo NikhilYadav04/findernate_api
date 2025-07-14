@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
+import 'package:social_media_clone/http/models/model_user.dart';
+import 'package:social_media_clone/http/services/auth_service.dart';
+import 'package:social_media_clone/http/utils/http_client.dart';
+import 'package:social_media_clone/core/router/appRouter.dart';
 
 class ProviderSignIn extends ChangeNotifier {
   //* Form Keys
@@ -57,48 +63,6 @@ class ProviderSignIn extends ChangeNotifier {
 
   bool get hasAnyError => _fieldErrors.values.any((e) => e);
 
-  //* Email validation utility
-  bool isEmail(String input) {
-    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
-    return emailRegex.hasMatch(input);
-  }
-
-  //* Login functionality
-  Future<bool> loginUser({
-    required BoxConstraints constraints,
-    required BuildContext context,
-  }) async {
-    _setLoading(true);
-
-    try {
-      // Add your login logic here
-      await Future.delayed(Duration(seconds: 2)); // Simulate login
-
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _setLoading(false);
-      return false;
-    }
-  }
-
-  //* Logout functionality
-  Future<void> signOut({
-    required BoxConstraints constraints,
-    required BuildContext context,
-  }) async {
-    try {
-      // Add your logout logic here
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/sign-in',
-        (Route<dynamic> route) => false,
-      );
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   //* Dispose Controllers
   @override
   void dispose() {
@@ -147,7 +111,7 @@ class ProviderRegister extends ChangeNotifier {
 
   //* State variables
   String registerPhone = "";
-  String gender = "Male";
+  String gender = "male";
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
@@ -175,7 +139,13 @@ class ProviderRegister extends ChangeNotifier {
   }
 
   void setGender(String newGender) {
-    gender = newGender;
+    if (newGender == "Male") {
+      gender = "male";
+    } else {
+      gender = "female";
+    }
+    personalGenderController.text = gender;
+    Logger().d(gender);
     notifyListeners();
   }
 
@@ -193,62 +163,6 @@ class ProviderRegister extends ChangeNotifier {
 
   bool get hasAnyError => _fieldErrors.values.any((e) => e);
 
-  //* Register functionality
-  Future<bool> registerUser({
-    required BoxConstraints constraints,
-    required BuildContext context,
-  }) async {
-    _setLoading(true);
-
-    try {
-      // Add your registration logic here
-      await Future.delayed(Duration(seconds: 2)); // Simulate registration
-
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _setLoading(false);
-      return false;
-    }
-  }
-
-  //* OTP functionality
-  Future<bool> sendOtp({
-    required BoxConstraints constraints,
-    required BuildContext context,
-  }) async {
-    _setLoading(true);
-
-    try {
-      // Add your OTP sending logic here
-      await Future.delayed(Duration(seconds: 1)); // Simulate OTP sending
-
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _setLoading(false);
-      return false;
-    }
-  }
-
-  Future<bool> verifyOtp({
-    required BoxConstraints constraints,
-    required BuildContext context,
-  }) async {
-    _setLoading(true);
-
-    try {
-      // Add your OTP verification logic here
-      await Future.delayed(Duration(seconds: 1)); // Simulate OTP verification
-
-      _setLoading(false);
-      return true;
-    } catch (e) {
-      _setLoading(false);
-      return false;
-    }
-  }
-
   //* Dispose Controllers
   @override
   void dispose() {
@@ -264,5 +178,308 @@ class ProviderRegister extends ChangeNotifier {
     personalCategoryController.dispose();
     personalAboutController.dispose();
     super.dispose();
+  }
+}
+
+class ProviderAuth extends ChangeNotifier {
+  final AuthService _authService = AuthService();
+  final HttpClient _httpClient = HttpClient();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+  UserModel? _currentUserData;
+
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  UserModel? get currentUserData => _currentUserData;
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
+
+  void _setCurrentUserData(UserModel? user) {
+    _currentUserData = user;
+    notifyListeners();
+  }
+
+  //* Login user
+  Future<bool> login({
+    required String usernameOrEmail,
+    required String password,
+    required BuildContext context,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.login(
+        usernameOrEmail: usernameOrEmail,
+        password: password,
+      );
+
+      if (response.success && response.data != null) {
+        _setCurrentUserData(UserModel.fromJson(response.data!['user']));
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Register user
+  Future<bool> register({
+    required String fullName,
+    required String username,
+    required String email,
+    required String password,
+    required String confirmPassword,
+    required String phoneNumber,
+    required String dateOfBirth,
+    required String gender,
+    required BuildContext context,
+    String? bio,
+    String? link,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.register(
+        fullName: fullName,
+        username: username,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        phoneNumber: phoneNumber,
+        dateOfBirth: dateOfBirth,
+        gender: gender,
+        bio: bio,
+        link: link,
+      );
+
+      if (response.success) {
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Verify email OTP for registration
+  Future<bool> verifyRegister({
+    required String email,
+    required String otp,
+    required BuildContext context,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.verifyUserRegister(
+        email: email,
+        otp: otp,
+      );
+
+      if (response.success) {
+        _setLoading(false);
+        if (response.data != null) {
+          _setCurrentUserData(UserModel.fromJson(response.data!));
+        }
+        showSnackBar(response.message, context, isError: false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Send verification OTP
+  Future<bool> sendVerificationOtp({
+    required String email,
+    required BuildContext context,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.sendVerificationOtp(
+        email: email,
+      );
+
+      if (response.success) {
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Verify email OTP
+  Future<bool> verifyEmailOtp({
+    required String email,
+    required String otp,
+    required BuildContext context,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.verifyEmailOtp(
+        email: email,
+        otp: otp,
+      );
+
+      if (response.success) {
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Change password
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required BuildContext context,
+  }) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+
+      if (response.success) {
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: false);
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Logout user
+  Future<bool> logout(BuildContext context) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.logout();
+
+      if (response.success) {
+        _setCurrentUserData(null);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: false);
+
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/onboard',
+          (route) => false, // This removes all previous routes
+          arguments: {
+            'transition': TransitionType.bottomToTop,
+            'duration': 300,
+          },
+        );
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Check if user is authenticated
+  Future<bool> isAuthenticated() async {
+    try {
+      return await _httpClient.isAuthenticated();
+    } catch (e) {
+      return false;
+    }
+  }
+
+  //* Clear error message
+  void clearError() {
+    _setError(null);
+  }
+
+  //* Clear all data (for app restart/logout)
+  void clearAll() {
+    _isLoading = false;
+    _errorMessage = null;
+    _currentUserData = null;
+    notifyListeners();
   }
 }

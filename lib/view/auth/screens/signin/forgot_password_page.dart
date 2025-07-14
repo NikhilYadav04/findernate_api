@@ -130,7 +130,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           constraints: constraints,
                           formKey: provider.forgetPassLastPasswordFormKey,
                           controller: provider.forgetPassLastPasswordController,
-                          validator: Validator.passwordValidator,
+                          validator: Validator.passwordBasicValidator,
                           key: 'remember-password',
                           isError: provider.hasError('remember-password'),
                           provider: provider,

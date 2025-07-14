@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_clone/controller/auth/controller_auth.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
 import 'package:social_media_clone/core/utils/validator.dart';
 import 'package:social_media_clone/view/auth/widgets/auth_widgets.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
@@ -20,28 +21,70 @@ class _PersonalInformationPage2State extends State<PersonalInformationPage2> {
   //* to toggle visibility
   bool isObSecure = false;
 
-  //* Call Register API CAL:
+  bool _isLoading = false;
+
+//* Call Register API CAL:
   void _handleRegisterUser({
     required BuildContext context,
     required BoxConstraints constraints,
     required ProviderRegister provider,
+    required ProviderAuth providerAuth,
   }) async {
-    final isFUllNameValid =
-        provider.usernameFormKey.currentState?.validate() ?? false;
-    final isPasswordValid =
-        provider.passwordFormKey.currentState?.validate() ?? false;
+    String? usernameError =
+        Validator.usernameValidator(provider.usernameController.text);
+    String? passwordError =
+        Validator.passwordBasicValidator(provider.passwordController.text);
+
+    bool isFUllNameValid = usernameError == null;
+    bool isPasswordValid = passwordError == null;
 
     if (isPasswordValid && isFUllNameValid) {
-      bool isRegistered = await provider.registerUser(
-          constraints: constraints, context: context);
-      if (isRegistered) {
-        Navigator.pushNamed(context, '/welcome-register');
+      setState(() {
+        _isLoading = true;
+      });
+
+      bool isSuccess = await providerAuth.register(
+        fullName: provider.personalFullNameController.text.toString(),
+        username: provider.personalFullNameController.text.toString(),
+        email: provider.personalEmailController.text.toString(),
+        password: provider.passwordController.text.toString(),
+        confirmPassword: provider.passwordController.text.toString(),
+        phoneNumber: provider.phoneFormController.text.toString(),
+        dateOfBirth: provider.personalDOBController.text.toString(),
+        gender: provider.gender,
+        context: context,
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (isSuccess) {
+        Navigator.pushNamed(
+          context,
+          '/otp-email-register',
+          arguments: {
+            'transition': TransitionType.rightToLeft,
+            'duration': 300,
+          },
+        );
+      }
+    } else {
+      if (!isFUllNameValid) {
+        showSnackBar(usernameError, context, isError: true);
+        return;
+      }
+
+      if (!isPasswordValid) {
+        showSnackBar(passwordError, context, isError: true);
+        return;
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final providerAuth = Provider.of<ProviderAuth>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
@@ -89,6 +132,15 @@ class _PersonalInformationPage2State extends State<PersonalInformationPage2> {
                     ),
                     SizedBox(height: scale(0.045)),
 
+                    authFieldLabelWithAsterisk("Phone", constraints),
+                    SizedBox(height: scale(0.008)),
+
+                    phoneField(
+                        constraints: constraints,
+                        formKey: provider.phoneFormKey,
+                        controller: provider.phoneFormController,
+                        provider: provider),
+
                     //* Fields And Label
                     authFieldLabelWithAsterisk("Username", constraints),
                     SizedBox(height: scale(0.008)),
@@ -111,7 +163,7 @@ class _PersonalInformationPage2State extends State<PersonalInformationPage2> {
                         constraints: constraints,
                         formKey: provider.passwordFormKey,
                         controller: provider.passwordController,
-                        validator: Validator.passwordValidator,
+                        validator: Validator.passwordBasicValidator,
                         key: 'password',
                         isError: provider.hasError('password'),
                         provider: provider,
@@ -123,7 +175,7 @@ class _PersonalInformationPage2State extends State<PersonalInformationPage2> {
                     Spacer(),
 
                     //* Buttons
-                    provider.isLoading
+                    _isLoading
                         ? Center(
                             child: SpinKitCircle(
                               color: AppColors.appYellow,
@@ -134,6 +186,7 @@ class _PersonalInformationPage2State extends State<PersonalInformationPage2> {
                             constraints,
                             "Done",
                             () => _handleRegisterUser(
+                                providerAuth: providerAuth,
                                 constraints: constraints,
                                 context: context,
                                 provider: provider)),

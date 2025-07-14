@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_clone/controller/auth/controller_auth.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
 import 'package:social_media_clone/core/utils/validator.dart';
 import 'package:social_media_clone/view/auth/widgets/auth_widgets_3.dart';
 
@@ -21,15 +23,31 @@ class _PersonalInformationPage1State extends State<PersonalInformationPage1> {
     required Size constraints,
     required ProviderRegister provider,
   }) async {
-    final isFullNameValid =
-        provider.personalFullNameKey.currentState?.validate() ?? false;
-    final isFullEmailValid =
-        provider.personalEmailKey.currentState?.validate() ?? false;
-    final isBioValid =
-        provider.personalAboutKey.currentState?.validate() ?? false;
+    var logger = Logger();
 
-    if (isFullEmailValid && isFullNameValid && isBioValid) {
+    String? nameError =
+        Validator.fullNameValidator(provider.personalFullNameController.text);
+    String? emailError =
+        Validator.emailValidator(provider.personalEmailController.text);
+
+    bool isFullNameValid = nameError == null;
+    bool isFullEmailValid = emailError == null;
+
+    logger.d(
+        " ${provider.personalEmailController.text} ${provider.personalFullNameController.text} ${isFullEmailValid}");
+
+    if (isFullEmailValid && isFullNameValid) {
       Navigator.pushNamed(context, '/personal-info-2');
+    } else {
+      if (!isFullNameValid) {
+        showSnackBar(nameError, context, isError: true);
+        return;
+      }
+
+      if (!isFullEmailValid) {
+        showSnackBar(emailError, context, isError: true);
+        return;
+      }
     }
   }
 

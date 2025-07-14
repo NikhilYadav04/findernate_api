@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:social_media_clone/http/utils/api_endpoints.dart';
+import 'package:logger/logger.dart';
 import '../config/api_config.dart';
 
 class HttpClient {
@@ -44,9 +44,6 @@ class HttpClient {
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-
-          //* Enable cookies for cookie-based auth
-          options.extra['withCredentials'] = true;
 
           if (kDebugMode) {
             print('REQUEST: ${options.method} ${options.uri}');
@@ -184,24 +181,33 @@ class HttpClient {
   //* Method 4: Check if user is authenticated
   Future<bool> isAuthenticated() async {
     final token = await getAuthToken();
+    final tokenReshresh = await getRefreshToken();
     final id = await getUserData();
 
     if (token == null || token.isEmpty || id == null || id.isEmpty) {
       return false;
     } else {
-      final response = await _dio.get(ApiEndpoints.getUserById(id),
-          options: Options(
-            headers: {
-              'Authorization': 'Bearer $token',
-            },
-          ));
+      // final response = await _dio.get(
+      //   '${ApiConfig.baseUrl}/api/v1/users/profile/search',
+      //   queryParameters: {
+      //     'query': 'amit__kumar123',
+      //   },
+      //   options: Options(
+      //     headers: {
+      //       'Authorization': 'Bearer $token',
+      //     },
+      //   ),
+      // );
 
-      if (response.statusCode == 401) {
-        logout();
-        return false;
-      } else {
-        return true;
-      }
+      // if (response.statusCode == 401) {
+      //   logout();
+      //   return false;
+      // } else {
+      //   return true;
+      // }
+      Logger().d("Token is Valid ${token!}");
+      Logger().d("Token is Valid ${tokenReshresh}");
+      return true;
     }
   }
 

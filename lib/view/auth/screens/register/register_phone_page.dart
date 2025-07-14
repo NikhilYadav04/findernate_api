@@ -23,12 +23,12 @@ class _RegisterPhonePageState extends State<RegisterPhonePage> {
     bool isPhoneValid = controller.length == 10;
 
     if (isPhoneValid) {
-      bool isOTPSend =
-          await provider.sendOtp(constraints: constraints, context: context);
+      // bool isOTPSend =
+      //     await provider.sendOtp(constraints: constraints, context: context);
 
-      if (isOTPSend) {
-        Navigator.pushNamed(context, "/otp-register"); // ✅ call it directly
-      }
+      // if (isOTPSend) {
+      //   Navigator.pushNamed(context, "/otp-register"); // ✅ call it directly
+      // }
     }
   }
 

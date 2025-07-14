@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/core/constants/appImages.dart';
-import 'package:social_media_clone/core/utils/helper.dart';
+import 'package:social_media_clone/core/router/appRouter.dart';
+import 'package:social_media_clone/http/utils/http_client.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -10,6 +11,9 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final HttpClient _httpClient = HttpClient();
+
+
   @override
   void initState() {
     super.initState();
@@ -20,13 +24,33 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> checkStatus(BuildContext context) async {
     //* Fetch login status from hive
-    await Future.delayed(const Duration(seconds: 2));
-    bool status = await HelperFunctions.isUserLoggedIn();
+    //* Display splash for 2 seconds minimum
+    await Future.delayed(Duration(seconds: 2));
 
-    if (status) {
-      Navigator.pushReplacementNamed(context, '/onboard');
-    } else {
-      Navigator.pushReplacementNamed(context, '/onboard');
+    //* Check authentication status
+    final bool isLoggedIn = await _httpClient.isAuthenticated();
+
+    //* Navigate based on authentication
+    if (mounted) {
+      if (isLoggedIn) {
+        Navigator.pushReplacementNamed(
+          context,
+          '/welcome-signin',
+          arguments: {
+            'transition': TransitionType.fade,
+            'duration': 300,
+          },
+        );
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+         '/onboard',
+          arguments: {
+            'transition': TransitionType.fade,
+            'duration': 300,
+          },
+        );
+      }
     }
   }
 
@@ -37,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+        padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
         child: Stack(
           children: [
             //* Circle 1 (top right)
@@ -76,7 +100,7 @@ class _SplashScreenState extends State<SplashScreen> {
               left: size.width * 0.2,
               child: _buildCircle(size.width * 0.1),
             ),
-        
+
             Positioned(
               bottom: size.height * 0.52,
               right: size.width * 0.037,

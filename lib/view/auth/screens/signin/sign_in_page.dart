@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_clone/controller/auth/controller_auth.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
 import 'package:social_media_clone/view/auth/widgets/auth_widgets.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
 
@@ -16,29 +17,64 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   //* to toggle visibility
   bool isObSecure = false;
+  bool _isLoading = false;
 
+//* Login API Call
   //* Login API Call
   void _handleLogin({
     required BuildContext context,
     required BoxConstraints constraints,
     required ProviderSignIn provider,
+    required ProviderAuth providerAuth,
   }) async {
-    final isUsernameValid =
-        provider.userNameFormKey.currentState?.validate() ?? false;
-    final isPasswordValid =
-        provider.passwordFormKey.currentState?.validate() ?? false;
+    bool isUsernameValid = provider.userNameController.text.trim().isNotEmpty;
+    bool isPasswordValid = provider.passwordController.text.trim().isNotEmpty;
 
     if (isUsernameValid && isPasswordValid) {
-      final success =
-          await provider.loginUser(constraints: constraints, context: context);
-      if (success) {
-        Navigator.pushNamed(context, '/welcome-signin');
+      setState(() {
+        _isLoading = true;
+      });
+
+      bool loginSuccess = await providerAuth.login(
+        usernameOrEmail: provider.userNameController.text.trim(),
+        password: provider.passwordController.text.trim(),
+        context: context,
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (loginSuccess) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/welcome-signin',
+          (route) => false,
+          arguments: {
+            'transition': TransitionType.fade,
+            'duration': 300,
+          },
+        );
+      }
+
+      return;
+    } else {
+      if (!isUsernameValid) {
+        showSnackBar("Please enter your username or email", context,
+            isError: true);
+        return;
+      }
+
+      if (!isPasswordValid) {
+        showSnackBar("Please enter your password", context, isError: true);
+        return;
       }
     }
   }
 
   @override
   Widget build(BuildContext screenContext) {
+    final providerAuth = Provider.of<ProviderAuth>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
@@ -120,36 +156,36 @@ class _SignInPageState extends State<SignInPage> {
                             })),
                     SizedBox(height: scale(0.01)),
 
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/forgot-pass');
-                          },
-                          child: ShaderMask(
-                            shaderCallback: (bounds) => LinearGradient(
-                              colors: [
-                                AppColors.appGradient1,
-                                AppColors.appGradient2,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ).createShader(Rect.fromLTWH(
-                                0, 0, bounds.width, bounds.height)),
-                            child: Text(
-                              'Forgot Password?',
-                              style: _style.copyWith(
-                                fontSize: scale(0.02),
-                                color: Colors
-                                    .white, // This is ignored due to ShaderMask
-                              ),
-                            ),
-                          )),
-                    ),
+                    // Align(
+                    //   alignment: Alignment.centerRight,
+                    //   child: TextButton(
+                    //       onPressed: () {
+                    //         Navigator.pushNamed(context, '/forgot-pass');
+                    //       },
+                    //       child: ShaderMask(
+                    //         shaderCallback: (bounds) => LinearGradient(
+                    //           colors: [
+                    //             AppColors.appGradient1,
+                    //             AppColors.appGradient2,
+                    //           ],
+                    //           begin: Alignment.topLeft,
+                    //           end: Alignment.bottomRight,
+                    //         ).createShader(Rect.fromLTWH(
+                    //             0, 0, bounds.width, bounds.height)),
+                    //         child: Text(
+                    //           'Forgot Password?',
+                    //           style: _style.copyWith(
+                    //             fontSize: scale(0.02),
+                    //             color: Colors
+                    //                 .white, // This is ignored due to ShaderMask
+                    //           ),
+                    //         ),
+                    //       )),
+                    // ),
                     Spacer(),
 
                     //* Buttons
-                    provider.isLoading
+                    _isLoading
                         ? Center(
                             child: SpinKitCircle(
                               color: AppColors.appYellow,
@@ -162,15 +198,16 @@ class _SignInPageState extends State<SignInPage> {
                             () => _handleLogin(
                                 constraints: constraints,
                                 context: context,
+                                providerAuth: providerAuth,
                                 provider: provider)),
 
                     //* No Account Text
                     noAccountSignUpText(constraints, () {
                       Navigator.pushReplacementNamed(
                         context,
-                        '/register-phone',
+                        '/personal-info-1',
                         arguments: {
-                          'transition': TransitionType.bottomToTop,
+                          'transition': TransitionType.rightToLeft,
                           'duration': 300,
                         },
                       );

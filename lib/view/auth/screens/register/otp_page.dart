@@ -1,82 +1,79 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_clone/controller/auth/controller_auth.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
-import 'package:social_media_clone/core/utils/toastCard.dart';
-import 'package:social_media_clone/core/utils/validator.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
 import 'package:social_media_clone/view/auth/widgets/auth_widgets.dart';
 
-class OtpPageRegister extends StatefulWidget {
-  const OtpPageRegister({super.key});
+class VerifyEmailOtpPage extends StatefulWidget {
+  final String email;
+
+  const VerifyEmailOtpPage({
+    super.key,
+    required this.email,
+  });
 
   @override
-  State<OtpPageRegister> createState() => _OtpPageRegisterState();
+  State<VerifyEmailOtpPage> createState() => _VerifyEmailOtpPageState();
 }
 
-class _OtpPageRegisterState extends State<OtpPageRegister> {
-  //* to toggle visibility
-  bool isObSecure = false;
+class _VerifyEmailOtpPageState extends State<VerifyEmailOtpPage> {
+  bool _isLoading = false;
 
-  //* Verify OTP API CALL
-  void _handleVerifyOTP(
-      {required BuildContext context,
-      required BoxConstraints constraints,
-      required ProviderRegister provider,
-      required TextEditingController controller}) async {
-    bool isOTPValid = controller.length == 4;
-
-    if (isOTPValid) {
-      _startTimer();
-      bool isOTPVerified =
-          await provider.verifyOtp(constraints: constraints, context: context);
-      if (isOTPVerified) {
-        Navigator.pushNamed(context, '/personal-info-1');
-      }
-    } else {
-      ToastCardWidget.showToast(
-          constraints: constraints,
-          context: context,
-          text: "OTP must be 4 digits long",
-          icon: Icons.error,
-          color: Colors.red);
+//* Verify Email OTP API CALL
+  void _handleVerifyEmailOTP({
+    required ProviderRegister provider,
+    required BuildContext context,
+    required BoxConstraints constraints,
+    required ProviderAuth providerAuth,
+  }) async {
+    //* Validate OTP length
+    if (provider.otpController.text.length != 6) {
+      showSnackBar(
+        "Please enter the complete 6-digit OTP",
+        context,
+        isError: true,
+      );
+      return;
     }
-  }
 
-  int _seconds = 60;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _seconds = 60;
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_seconds == 0) {
-        timer.cancel();
-      } else {
-        setState(() {
-          _seconds--;
-        });
-      }
+    setState(() {
+      _isLoading = true;
     });
+
+    bool isSuccess = await providerAuth.verifyRegister(
+      email: provider.personalEmailController.text.toString(),
+      otp: provider.otpController.text.toString(),
+      context: context,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (isSuccess) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/welcome-register',
+        (route) => false,
+        arguments: {
+          'transition': TransitionType.rightToLeft,
+          'duration': 300,
+        },
+      );
+    }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final providerAuth = Provider.of<ProviderAuth>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
@@ -98,85 +95,82 @@ class _OtpPageRegisterState extends State<OtpPageRegister> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: scale(0.03)),
+                    SizedBox(height: scale(0.015)),
+
+                    //* Back Button
                     InkWell(
-                        onTap: () {
-                          if (Navigator.canPop(context)) {
-                            Navigator.pop(context);
-                          }
-                        },
-                        child: Icon(Icons.arrow_back_ios, size: scale(0.035))),
+                      onTap: () {
+                        if (Navigator.canPop(context)) {
+                          Navigator.pop(context);
+                        }
+                      },
+                      child: Icon(Icons.arrow_back_ios, size: scale(0.035)),
+                    ),
                     SizedBox(height: scale(0.04)),
+
+                    //* Title
                     Text(
-                      'OTP Sent',
+                      'Verify Email',
                       style: _style.copyWith(
-                        fontSize: scale(0.035),
+                        fontSize: scale(0.032),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: scale(0.012)),
+                    SizedBox(height: scale(0.015)),
+
+                    //* Subtitle below OTP field
                     Text(
-                      'Enter the OTP sent to you',
+                      'Enter the verification code sent to your email',
                       style: _style.copyWith(
-                        fontSize: scale(0.025),
-                        color: Colors.grey.shade700,
+                        fontSize: scale(0.023),
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: scale(0.045)),
 
-                    //* Fields And Label
-                    Pinput(
-                      controller: provider.otpController,
+                    SizedBox(height: scale(0.025)),
+
+                    //* OTP Input Field
+                    Form(
                       key: provider.otpFormKey,
-                      length: 6,
-                      defaultPinTheme: defaultPinTheme(constraints),
-                      focusedPinTheme: defaultPinTheme(constraints),
-                      submittedPinTheme: defaultPinTheme(constraints),
-                      showCursor: true,
-                      onCompleted: (pin) {},
-                      readOnly: false,
-                    ),
-                    SizedBox(height: scale(0.028)),
-
-                    FittedBox(
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_seconds == 0) {
-                            setState(() {
-                              _handleVerifyOTP(
-                                  context: context,
-                                  constraints: constraints,
-                                  provider: provider,
-                                  controller: provider.otpController);
-                            });
-                          }
-                        },
-                        child: RichText(
-                          text: TextSpan(
-                            text: "Didn't receive any code? ",
-                            style: _style.copyWith(
-                              color: Colors.black,
-                              fontSize: scale(0.021),
-                              fontWeight: FontWeight.w600,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: _seconds == 0
-                                    ? "Resend"
-                                    : "Resend in ${formatTime(_seconds)}",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ],
-                          ),
+                      child: Pinput(
+                        controller: provider.otpController,
+                        length: 6,
+                        defaultPinTheme: defaultPinTheme(constraints),
+                        focusedPinTheme: defaultPinTheme(constraints).copyWith(
+                          decoration:
+                              defaultPinTheme(constraints).decoration!.copyWith(
+                                    border: Border.all(
+                                        color: Color(0xFFFCD45C), width: 2),
+                                  ),
                         ),
+                        submittedPinTheme:
+                            defaultPinTheme(constraints).copyWith(
+                          decoration: defaultPinTheme(constraints)
+                              .decoration!
+                              .copyWith(
+                                border:
+                                    Border.all(color: Colors.green, width: 2),
+                              ),
+                        ),
+                        errorPinTheme: defaultPinTheme(constraints).copyWith(
+                          decoration: defaultPinTheme(constraints)
+                              .decoration!
+                              .copyWith(
+                                border: Border.all(color: Colors.red, width: 2),
+                              ),
+                        ),
+                        showCursor: true,
+                        onCompleted: (pin) {},
+                        readOnly: provider.isLoading,
+                        keyboardType: TextInputType.number,
                       ),
                     ),
+
                     Spacer(),
 
-                    //* Buttons
-                    provider.isLoading
+                    //* Verify Button
+                    _isLoading
                         ? Center(
                             child: SpinKitCircle(
                               color: Color(0xFFFCD45C),
@@ -185,14 +179,18 @@ class _OtpPageRegisterState extends State<OtpPageRegister> {
                           )
                         : authButton(
                             constraints,
-                            "Next",
-                            () => _handleVerifyOTP(
-                                provider: provider,
-                                constraints: constraints,
-                                context: context,
-                                controller: provider.otpController)),
+                            "Verify OTP",
+                            () => _handleVerifyEmailOTP(
+                              providerAuth: providerAuth,
+                              provider: provider,
+                              constraints: constraints,
+                              context: context,
+                            ),
+                          ),
 
-                    //* No Account Text
+                    SizedBox(height: scale(0.0)),
+
+                    //* Sign In Text
                     noAccountSignInText(constraints, () {
                       Navigator.pushReplacementNamed(
                         context,

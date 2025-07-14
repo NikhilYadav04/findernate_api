@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/view/auth/screens/register/otp_page.dart';
 import 'package:social_media_clone/view/auth/screens/register/personal_information_page_1.dart';
@@ -6,8 +5,8 @@ import 'package:social_media_clone/view/auth/screens/register/personal_informati
 import 'package:social_media_clone/view/auth/screens/register/register_phone_page.dart';
 import 'package:social_media_clone/view/auth/screens/signin/forgot_email_card.dart';
 import 'package:social_media_clone/view/auth/screens/signin/forgot_password_page.dart';
-import 'package:social_media_clone/view/auth/screens/signin/otp_page.dart';
 import 'package:social_media_clone/view/auth/screens/signin/sign_in_page.dart';
+import 'package:social_media_clone/view/auth/screens/test/auth_test.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_register.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_signin.dart';
 import 'package:social_media_clone/view/onboarding/screens/onboard_root_screen.dart';
@@ -91,6 +90,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case '/':
       page = SplashScreen();
+      //page = AuthTestingPage();
       break;
     case '/onboard':
       page = OnboardRootScreen();
@@ -116,11 +116,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/personal-info-2':
       page = PersonalInformationPage2();
       break;
-    case '/otp-signin':
-      page = OtpPage();
-      break;
-    case '/otp-register':
-      page = OtpPageRegister();
+    case '/otp-email-register':
+      page = VerifyEmailOtpPage(email: "");
       break;
     case '/forget-card':
       page = ForgotEmailCard();
