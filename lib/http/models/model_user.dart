@@ -6,6 +6,9 @@ class UserModel {
   final String phoneNumber;
   final String dateOfBirth;
   final String gender;
+  final String bio;
+  final String profileImageUrl;
+  final String location; // Added
   final List<String> followers;
   final List<String> following;
   final List<String> posts;
@@ -21,6 +24,9 @@ class UserModel {
     required this.phoneNumber,
     required this.dateOfBirth,
     required this.gender,
+    required this.bio,
+    required this.profileImageUrl,
+    required this.location, // Added
     required this.followers,
     required this.following,
     required this.posts,
@@ -31,13 +37,16 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      uid: json['uid'] ?? '',
+      uid: json['_id'] ?? '',
       username: json['username'] ?? '',
       email: json['email'] ?? '',
       fullName: json['fullName'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
       dateOfBirth: json['dateOfBirth'] ?? '',
       gender: json['gender'] ?? '',
+      bio: json['bio'] ?? '',
+      profileImageUrl: json['profileImageUrl'] ?? '',
+      location: json['location'] ?? '', // Added
       followers: List<String>.from(json['followers'] ?? []),
       following: List<String>.from(json['following'] ?? []),
       posts: List<String>.from(json['posts'] ?? []),
@@ -49,13 +58,16 @@ class UserModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'uid': uid,
+      '_id': uid,
       'username': username,
       'email': email,
       'fullName': fullName,
       'phoneNumber': phoneNumber,
       'dateOfBirth': dateOfBirth,
       'gender': gender,
+      'bio': bio,
+      'profileImageUrl': profileImageUrl,
+      'location': location, // Added
       'followers': followers,
       'following': following,
       'posts': posts,

@@ -15,4 +15,11 @@ class ApiEndpoints {
   static String get changePassword =>
       '${ApiConfig.baseUrl}/api/v1/users/profile/change-password';
   static String get refreshToken => '${ApiConfig.baseUrl}/auth/refresh';
+  static String get deleteAccount =>
+      '${ApiConfig.baseUrl}/api/v1/users/profile';
+
+ //* User Endpoint
+ static String get getUserStats => '${ApiConfig.baseUrl}/api/v1/users/profile';
+ static String get editUserProfile => '${ApiConfig.baseUrl}/api/v1/users/profile';
+ 
 }

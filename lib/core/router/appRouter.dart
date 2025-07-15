@@ -1,4 +1,11 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:social_media_clone/controller/profile/profile_controller.dart';
+import 'package:social_media_clone/view/auth/screens/others/change_password_otp.dart';
+import 'package:social_media_clone/view/auth/screens/others/change_password_screen.dart';
+import 'package:social_media_clone/view/auth/screens/others/delete_account_screen.dart';
 import 'package:social_media_clone/view/auth/screens/register/otp_page.dart';
 import 'package:social_media_clone/view/auth/screens/register/personal_information_page_1.dart';
 import 'package:social_media_clone/view/auth/screens/register/personal_information_page_2.dart';
@@ -6,11 +13,15 @@ import 'package:social_media_clone/view/auth/screens/register/register_phone_pag
 import 'package:social_media_clone/view/auth/screens/signin/forgot_email_card.dart';
 import 'package:social_media_clone/view/auth/screens/signin/forgot_password_page.dart';
 import 'package:social_media_clone/view/auth/screens/signin/sign_in_page.dart';
-import 'package:social_media_clone/view/auth/screens/test/auth_test.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_register.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_signin.dart';
+import 'package:social_media_clone/view/bottom_bar_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/onboard_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/splash_screen.dart';
+import 'package:social_media_clone/view/profile/screen/image_crop_screen.dart';
+import 'package:social_media_clone/view/profile/screen/profile_edit_screen.dart';
+import 'package:social_media_clone/view/settings/screen/account_settings_screen.dart';
+import 'package:social_media_clone/view/settings/screen/profile_settings_screen_2.dart';
 
 enum TransitionType {
   rightToLeft,
@@ -119,10 +130,46 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/otp-email-register':
       page = VerifyEmailOtpPage(email: "");
       break;
+    case '/delete-account':
+      page = DeleteAccountPage();
+      break;
+    case '/otp-change-password':
+      final email = args?['email'];
+      page = PasswordChangeOtpPage(email: email);
+      break;
+    case '/change-password':
+      page = ChangePasswordScreen();
+      break;
     case '/forget-card':
       page = ForgotEmailCard();
       break;
-
+    case '/bottom-bar':
+      page = BottomBarScreen();
+    case '/profile-edit-screen':
+      final isProfile = args?['isProfile'];
+      page = EditProfileScreen(
+        isProfile: isProfile,
+      );
+      break;
+    case '/image-crop-screen':
+      File image = args?['image'] ?? '';
+      final ProviderProfile provider = args?['provider'];
+      page = SimpleCropScreen(
+        image: image,
+        provider: provider,
+      );
+      break;
+    case '/settings-screen':
+      final isBusiness = args?['isBusiness'] ?? false;
+      final isBusinessDetails = args?['isBusinessDetails'] ?? false;
+      page = ProfileSettingsScreen2(
+        isBusiness: isBusiness,
+        isBusinessDetails: isBusinessDetails,
+      );
+      break;
+    case '/account-settings-screen':
+      page = AccountSettingsScreen();
+      break;
     default:
       page = Text("No Pages Available");
       break;

@@ -182,4 +182,21 @@ class AuthService extends ApiService {
 
     return response;
   }
+
+  //* Delete Account
+  Future<ApiResponse<Map<String, dynamic>>> deleteAccount(
+      {required String password}) async {
+    final response = await delete<Map<String, dynamic>>(
+      ApiEndpoints.deleteAccount,
+      data: {"password": password},
+      fromJson: (data) => data as Map<String, dynamic>,
+    );
+
+    //* Clear local tokens regardless of server response
+    await _httpClient.logout();
+
+    return response;
+  }
+
+
 }

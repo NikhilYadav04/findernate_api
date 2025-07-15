@@ -58,43 +58,36 @@ Widget authButton2(Size size, String title, VoidCallback onTap) {
   return SizedBox(
     width: double.infinity,
     height: h * 0.07,
-    child: Stack(
-      children: [
-        // Gradient background container
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(h * 0.015),
-            gradient: LinearGradient(
-              colors: [AppColors.appGradient1, AppColors.appGradient2],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
+    child: Container(
+      width: double.infinity,
+      height: size.height * 0.068,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.appGradient1, AppColors.appGradient2],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
-        // Transparent ElevatedButton
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(h * 0.015),
-            ),
-          ),
-          onPressed: onTap,
-          child: Center(
-            child: Text(
-              title,
-              style: _style.copyWith(
-                fontSize: h * 0.028,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        child: Text(
+          title,
+          style: _style.copyWith(
+            fontSize: size.height* 0.025,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
-      ],
-    ),
+      ),
+    )
   );
 }
 

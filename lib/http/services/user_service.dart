@@ -1,39 +1,31 @@
-// import 'package:social_media_clone/http/models/api_reponse.dart';
-// import 'package:social_media_clone/http/models/model_expert.dart';
-// import 'package:social_media_clone/http/models/model_user.dart';
-// import 'package:social_media_clone/http/services/api_service.dart';
-// import 'package:social_media_clone/http/utils/api_endpoints.dart';
-// import 'package:social_media_clone/http/utils/http_client.dart';
+import 'package:social_media_clone/http/models/api_reponse.dart';
+import 'package:social_media_clone/http/services/api_service.dart';
+import 'package:social_media_clone/http/utils/api_endpoints.dart';
 
-// class UserService extends ApiService {
-//   final HttpClient _httpClient = HttpClient();
+class UserService extends ApiService {
+  //* Get user stats/details by user ID
+  Future<ApiResponse<Map<String, dynamic>>> getUserStats() async {
+    final response = await get<Map<String, dynamic>>(
+      ApiEndpoints.getUserStats,
+      fromJson: (data) => data as Map<String, dynamic>,
+    );
 
-//   //* Get user stats/details by user ID
-//   Future<ApiResponse<UserModel>> getUserStats() async {
-//     final userId = await _httpClient.getUserData();
+    return response;
+  }
 
-//     final response = await get<UserModel>(
-//       ApiEndpoints.getUserById(userId!),
-//       fromJson: (data) => UserModel.fromJson(data as Map<String, dynamic>),
-//     );
+  //* Upload Profile Photo
+  
 
-//     return response;
-//   }
+  //* Edit User Profile
+  Future<ApiResponse<Map<String, dynamic>>> editUserProfile({
+    required Map<String, dynamic> profileData,
+  }) async {
+    final response = await put<Map<String, dynamic>>(
+      ApiEndpoints.editUserProfile,
+      data: profileData,
+      fromJson: (data) => data as Map<String, dynamic>,
+    );
 
-//   //* Get ALl Experts List
-//   Future<ApiResponse<List<ExpertModel>>> getAllExperts() async {
-//     final response = await get<List<ExpertModel>>(
-//       ApiEndpoints.getAllExperts,
-//       fromJson: (data) {
-//         if (data is List) {
-//           return data
-//               .map((item) => ExpertModel.fromJson(item as Map<String, dynamic>))
-//               .toList();
-//         }
-//         throw Exception('Invalid experts data format');
-//       },
-//     );
-
-//     return response;
-//   }
-// }
+    return response;
+  }
+}

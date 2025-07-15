@@ -238,35 +238,35 @@ Widget passwordFieldSignIn(
 Widget authButton(
     BoxConstraints constraints, String title, VoidCallback onTap) {
   return Container(
-    width: double.infinity,
-    height: constraints.maxHeight * 0.07,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(constraints.maxHeight * 0.015),
-      gradient: LinearGradient(
-        colors: [AppColors.appGradient1, AppColors.appGradient2],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+      width: double.infinity,
+      height: constraints.maxHeight * 0.068,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.appGradient1, AppColors.appGradient2],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(12),
       ),
-    ),
-    child: Material(
-      color: Colors.transparent,
-      borderRadius: BorderRadius.circular(constraints.maxHeight * 0.015),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(constraints.maxHeight * 0.015),
-        onTap: onTap,
-        child: Center(
-          child: Text(
-            title,
-            style: _style.copyWith(
-              fontSize: constraints.maxHeight * 0.028,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          title,
+          style: _style.copyWith(
+            fontSize: constraints.maxHeight* 0.025,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
           ),
         ),
       ),
-    ),
-  );
+    );
 }
 
 Widget noAccountSignUpText(BoxConstraints constraints, VoidCallback onTap) {

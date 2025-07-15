@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:social_media_clone/core/utils/snackBar.dart';
+import 'package:social_media_clone/http/models/api_reponse.dart';
 import 'package:social_media_clone/http/models/model_user.dart';
 import 'package:social_media_clone/http/services/auth_service.dart';
+import 'package:social_media_clone/http/services/user_service.dart';
 import 'package:social_media_clone/http/utils/http_client.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
 
@@ -18,6 +21,11 @@ class ProviderSignIn extends ChangeNotifier {
   final GlobalKey<FormState> oldPasswordKey = GlobalKey<FormState>();
   final GlobalKey<FormState> newPasswordKey = GlobalKey<FormState>();
   final GlobalKey<FormState> otpFormKey = GlobalKey<FormState>();
+  //* delete account
+  final GlobalKey<FormState> deletePasswordKey = GlobalKey<FormState>();
+
+  //* change password
+  final GlobalKey<FormState> changeOTPKey = GlobalKey<FormState>();
 
   //* TextField Controllers
   final TextEditingController userNameController = TextEditingController();
@@ -33,6 +41,13 @@ class ProviderSignIn extends ChangeNotifier {
   final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
+
+  //* delete account
+  final TextEditingController deletePasswordController =
+      TextEditingController();
+
+  //* delete account
+  final TextEditingController changeOTPController = TextEditingController();
 
   //* Loading state
   bool _isLoading = false;
@@ -186,10 +201,12 @@ class ProviderAuth extends ChangeNotifier {
   final HttpClient _httpClient = HttpClient();
 
   bool _isLoading = false;
+  bool _isUserStatsLoading = false;
   String? _errorMessage;
   UserModel? _currentUserData;
 
   bool get isLoading => _isLoading;
+  bool get isUserStatsLoading => _isUserStatsLoading;
   String? get errorMessage => _errorMessage;
   UserModel? get currentUserData => _currentUserData;
 
@@ -206,6 +223,146 @@ class ProviderAuth extends ChangeNotifier {
   void _setCurrentUserData(UserModel? user) {
     _currentUserData = user;
     notifyListeners();
+  }
+
+  void setCurrentUserData(UserModel? user) {
+    _currentUserData = user;
+    notifyListeners();
+  }
+
+  //* Get Users Stats and store in User Model ( when user launches app)
+  Future<void> getUserStats({required BuildContext context}) async {
+    //* Don't run if user stats are already loading or if _currentUserData is not empty
+    if (_isUserStatsLoading || _currentUserData != null) {
+      return;
+    }
+
+    try {
+      _isUserStatsLoading = true;
+      notifyListeners();
+
+      final _userService = UserService();
+      ApiResponse<Map<String, dynamic>> response =
+          await _userService.getUserStats();
+
+      if (response.success && response.data != null) {
+        _currentUserData = UserModel.fromJson(response.data!);
+
+        notifyListeners();
+      } else {
+        showSnackBar("Error fetching stats", context, isError: true);
+        Logger().d(response.data!);
+
+        _currentUserData = UserModel(
+          uid: "",
+          username: "",
+          email: "",
+          fullName: "",
+          phoneNumber: "",
+          dateOfBirth: "",
+          gender: "",
+          bio: "",
+          profileImageUrl: "",
+          location: "",
+          followers: [],
+          following: [],
+          posts: [],
+          isBusinessProfile: false,
+          isEmailVerified: false,
+          isPhoneVerified: false,
+        );
+      }
+    } catch (e) {
+      showSnackBar("Error fetching stats", context, isError: true);
+
+      _currentUserData = UserModel(
+        uid: "",
+        username: "",
+        email: "",
+        fullName: "",
+        phoneNumber: "",
+        dateOfBirth: "",
+        gender: "",
+        bio: "",
+        profileImageUrl: "",
+        location: "",
+        followers: [],
+        following: [],
+        posts: [],
+        isBusinessProfile: false,
+        isEmailVerified: false,
+        isPhoneVerified: false,
+      );
+    } finally {
+      _isUserStatsLoading = false;
+      notifyListeners();
+    }
+  }
+
+  //* Refresh Users Stats (force refresh)
+  Future<void> refreshUserStats({required BuildContext context}) async {
+    try {
+      if (_isUserStatsLoading) {
+        return;
+      }
+
+      _isUserStatsLoading = true;
+      notifyListeners();
+
+      final _userService = UserService();
+      ApiResponse<Map<String, dynamic>> response =
+          await _userService.getUserStats();
+
+      if (response.success && response.data != null) {
+        _currentUserData = UserModel.fromJson(response.data!);
+        notifyListeners();
+      } else {
+        showSnackBar("Error refreshing stats", context, isError: true);
+
+        _currentUserData = UserModel(
+          uid: "",
+          username: "",
+          email: "",
+          fullName: "",
+          phoneNumber: "",
+          dateOfBirth: "",
+          gender: "",
+          bio: "",
+          profileImageUrl: "",
+          location: "",
+          followers: [],
+          following: [],
+          posts: [],
+          isBusinessProfile: false,
+          isEmailVerified: false,
+          isPhoneVerified: false,
+        );
+      }
+    } catch (e) {
+      showSnackBar("Error refreshing stats", context, isError: true);
+
+      _currentUserData = UserModel(
+        uid: "",
+        username: "",
+        email: "",
+        fullName: "",
+        phoneNumber: "",
+        dateOfBirth: "",
+        gender: "",
+        bio: "",
+        profileImageUrl: "",
+        location: "",
+        followers: [],
+        following: [],
+        posts: [],
+        isBusinessProfile: false,
+        isEmailVerified: false,
+        isPhoneVerified: false,
+      );
+    } finally {
+      _isUserStatsLoading = false;
+      notifyListeners();
+    }
   }
 
   //* Login user
@@ -441,6 +598,43 @@ class ProviderAuth extends ChangeNotifier {
           context,
           '/onboard',
           (route) => false, // This removes all previous routes
+          arguments: {
+            'transition': TransitionType.bottomToTop,
+            'duration': 300,
+          },
+        );
+        return true;
+      } else {
+        _setError(response.message);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      _setError('An unexpected error occurred: $e');
+      _setLoading(false);
+      showSnackBar('An unexpected error occurred', context, isError: true);
+      return false;
+    }
+  }
+
+  //* Logout user
+  Future<bool> delete(BuildContext context, String password) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _authService.deleteAccount(password: password);
+
+      if (response.success) {
+        _setCurrentUserData(null);
+        _setLoading(false);
+        showSnackBar(response.message, context, isError: false);
+
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/onboard',
+          (route) => false,
           arguments: {
             'transition': TransitionType.bottomToTop,
             'duration': 300,

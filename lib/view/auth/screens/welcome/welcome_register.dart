@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/core/constants/appImages.dart';
+import 'package:social_media_clone/core/router/appRouter.dart';
 import 'package:social_media_clone/view/auth/widgets/auth_widgets.dart';
 
 class WelcomeRegister extends StatelessWidget {
@@ -40,16 +41,16 @@ class WelcomeRegister extends StatelessWidget {
                           padding: EdgeInsets.symmetric(
                               horizontal: constraints.maxWidth * 0.05),
                           child: authButton(constraints, "Done", () {
-                            // Navigator.pushNamedAndRemoveUntil(
-                            //   context,
-                            //   '/bottom-bar',
-                            //   (Route<dynamic> route) =>
-                            //       false, // removes all previous routes
-                            //   arguments: {
-                            //     'transition': TransitionType.rightToLeft,
-                            //     'duration': 300,
-                            //   },
-                            // );
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/bottom-bar',
+                              (Route<dynamic> route) =>
+                                  false, // removes all previous routes
+                              arguments: {
+                                'transition': TransitionType.rightToLeft,
+                                'duration': 300,
+                              },
+                            );
                           }),
                         )
                       ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_media_clone/controller/auth/controller_auth.dart';
 import 'package:social_media_clone/controller/dummy.dart';
+import 'package:social_media_clone/controller/profile/profile_controller.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
 import 'package:social_media_clone/services/connectivityServices.dart';
 
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProviderSignIn()),
         ChangeNotifierProvider(create: (_) => ProviderRegister()),
         ChangeNotifierProvider(create: (_) => ProviderRegister()),
+        ChangeNotifierProvider(create: (_) => ProviderProfile()),
         ChangeNotifierProvider(create: (_) => ProviderAuth()),
         ChangeNotifierProvider(create: (_) => Dummy()),
       ],
