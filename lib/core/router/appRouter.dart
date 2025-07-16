@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/controller/profile/profile_controller.dart';
 import 'package:social_media_clone/view/auth/screens/others/change_password_otp.dart';
@@ -16,6 +14,7 @@ import 'package:social_media_clone/view/auth/screens/signin/sign_in_page.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_register.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_signin.dart';
 import 'package:social_media_clone/view/bottom_bar_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/post_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/onboard_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/splash_screen.dart';
 import 'package:social_media_clone/view/profile/screen/image_crop_screen.dart';
@@ -170,6 +169,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/account-settings-screen':
       page = AccountSettingsScreen();
       break;
+    case '/post-add-screen':
+      page = CreatePostScreen();
     default:
       page = Text("No Pages Available");
       break;

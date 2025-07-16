@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:social_media_clone/controller/auth/controller_auth.dart';
@@ -19,6 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _refresh() async {
     final authProvider = Provider.of<ProviderAuth>(context, listen: false);
     authProvider.refreshUserStats(context: context);
+    Logger().d(authProvider.currentUserData!.profileImageUrl);
   }
 
   @override
@@ -147,13 +149,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         children: [
                                           SvgPicture.asset(
                                             "assets/images/svg/ic_notify.svg",
-                                            height: screenHeight * 0.028,
-                                            width: screenWidth * 0.028,
+                                            height: screenHeight * 0.03,
+                                            width: screenWidth * 0.03,
                                             fit: BoxFit.contain,
                                             color: Colors.black,
                                           ),
                                           SizedBox(
-                                            width: 15,
+                                            width: 20,
                                           ),
                                           InkWell(
                                             onTap: () {
@@ -206,8 +208,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     },
                                     {
                                       'profileURL': provider.currentUserData
-                                              ?.profileImageUrl ??
-                                          'https://static.thenounproject.com/png/630737-200.png',
+                                                  ?.profileImageUrl ==
+                                              ""
+                                          ? 'https://static.thenounproject.com/png/630737-200.png'
+                                          : provider.currentUserData
+                                                  ?.profileImageUrl ??
+                                              'https://static.thenounproject.com/png/630737-200.png'
                                     },
                                   ],
                                   maxHeight: screenHeight,
@@ -222,8 +228,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 profileBio(
                                     maxHeight: screenHeight,
                                     maxWidth: screenWidth,
-                                    bio: provider.currentUserData?.bio ??
-                                        "Hey I Am Using Instagram"),
+                                    bio: provider.currentUserData?.bio == ""
+                                        ? "Hey I Am Using Instagram"
+                                        : provider.currentUserData?.bio ??
+                                            "Hey I Am Using Instagram"),
                                 SizedBox(height: screenHeight * 0.03),
 
                                 //* Follow/Following Button

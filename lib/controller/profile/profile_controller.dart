@@ -16,6 +16,7 @@ class ProviderProfile extends ChangeNotifier {
   final GlobalKey<FormState> bioKey = GlobalKey<FormState>();
   final GlobalKey<FormState> dateKey = GlobalKey<FormState>();
   final GlobalKey<FormState> businessNameKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> locationKey = GlobalKey<FormState>();
   final GlobalKey<FormState> subCatKey1 = GlobalKey<FormState>();
   final GlobalKey<FormState> subCatKey2 = GlobalKey<FormState>();
   final GlobalKey<FormState> subCatKey3 = GlobalKey<FormState>();
@@ -28,6 +29,7 @@ class ProviderProfile extends ChangeNotifier {
   final TextEditingController dateController = TextEditingController();
   final TextEditingController profileImageController = TextEditingController();
   final TextEditingController businessNameController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
   final TextEditingController subCatController1 = TextEditingController();
   final TextEditingController subCatController2 = TextEditingController();
   final TextEditingController subCatController3 = TextEditingController();
@@ -117,19 +119,45 @@ class ProviderProfile extends ChangeNotifier {
   }
 
   //* Update User Profile API Call
-  Future<bool> updateUserProfile({required BuildContext context}) async {
+  Future<bool> updateUserProfile({
+    required BuildContext context,
+   
+  }) async {
     try {
       setLoading(true);
 
       final userService = UserService();
+      String finalProfileImageUrl = profileImageController.text;
+
+      if (imageFIle != null) {
+        try {
+          final uploadResponse = await userService.uploadProfilePhoto(
+            imagePath: imageFIle!.path,
+          );
+
+          if (uploadResponse.success &&
+              uploadResponse.data?['profileImageUrl'] != null) {
+            finalProfileImageUrl = uploadResponse.data!['profileImageUrl'];
+          } else {
+            showSnackBar(
+                "Failed to upload profile image. Continuing to update other fields.",
+                context,
+                isError: true);
+          }
+        } catch (e) {
+          showSnackBar(
+              "Error uploading image. Continuing to update other fields.",
+              context,
+              isError: true);
+        }
+      }
 
       Map<String, dynamic> profileData = {
         'fullName': fullNameController.text.trim(),
         'bio': bioController.text.trim(),
-        'location': '',
+        'location': locationController.text.toString(),
         'link': '',
-        'profileImageUrl':
-            'https://static.thenounproject.com/png/630737-200.png',
+        'profileImageUrl': finalProfileImageUrl,
       };
 
       ApiResponse<Map<String, dynamic>> response =
@@ -141,14 +169,16 @@ class ProviderProfile extends ChangeNotifier {
         final authProvider = Provider.of<ProviderAuth>(context, listen: false);
         authProvider.setCurrentUserData(UserModel.fromJson(response.data!));
         showSnackBar("Profile updated successfully", context, isError: false);
-
+        clearAllData();
         return true;
       } else {
-        showSnackBar("Failed to update profile", context, isError: true);
+        showSnackBar(response.message, context,
+            isError: true);
         return false;
       }
     } catch (e) {
-      showSnackBar("Error updating profile", context, isError: true);
+      showSnackBar("An error occurred while updating profile", context,
+          isError: true);
       return false;
     } finally {
       setLoading(false);
@@ -167,10 +197,10 @@ class ProviderProfile extends ChangeNotifier {
     subCatController1.clear();
     subCatController2.clear();
     subCatController3.clear();
+    locationController.clear();
 
-    gender = "Male";
+    gender = "male";
     imageFIle = null;
-    _isBusinessProfile = false;
     _businessType = "Fashion";
     _isLoading = false;
 

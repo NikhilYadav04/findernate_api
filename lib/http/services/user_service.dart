@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:social_media_clone/http/models/api_reponse.dart';
 import 'package:social_media_clone/http/services/api_service.dart';
 import 'package:social_media_clone/http/utils/api_endpoints.dart';
@@ -14,7 +15,24 @@ class UserService extends ApiService {
   }
 
   //* Upload Profile Photo
-  
+  Future<ApiResponse<Map<String, dynamic>>> uploadProfilePhoto({
+    required String imagePath,
+  }) async {
+    final formData = FormData.fromMap({
+      'profileImage': await MultipartFile.fromFile(
+        imagePath,
+        filename: imagePath.split('/').last,
+      ),
+    });
+
+    final response = await post<Map<String, dynamic>>(
+      ApiEndpoints.uploadProfilePhoto,
+      data: formData,
+      fromJson: (data) => data as Map<String, dynamic>,
+    );
+
+    return response;
+  }
 
   //* Edit User Profile
   Future<ApiResponse<Map<String, dynamic>>> editUserProfile({

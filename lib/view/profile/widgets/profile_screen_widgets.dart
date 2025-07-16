@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
 import 'package:social_media_clone/core/utils/showPreview.dart';
-import 'package:social_media_clone/model/user/model_user_summary.dart';
 import 'package:social_media_clone/model/user/posts/model_post.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
 
@@ -548,8 +547,8 @@ Widget profileBar({
   required double maxHeight,
   required double maxWidth,
   required String title,
-  bool isBusinessAccount = false, // Add this parameter
-  bool isBusinessDetails = false, // Add this parameter
+  bool isBusinessAccount = false,
+  bool isBusinessDetails = false,
 }) {
   return Container(
     height: maxHeight * 0.065,

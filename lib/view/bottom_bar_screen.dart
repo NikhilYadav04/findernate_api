@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
 import 'package:social_media_clone/core/constants/appControllers.dart';
+import 'package:social_media_clone/core/router/appRouter.dart';
 import 'package:social_media_clone/view/bottom_bar_widgets.dart';
 import 'package:social_media_clone/view/profile/screen/profile_screen.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
@@ -47,14 +48,14 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
     AppControllers.mainController = PageController(initialPage: _currentIndex);
     _navigationList = [
       () {
-        // Navigator.pushNamed(
-        //   context,
-        //   '/post-add-screen',
-        //   arguments: {
-        //     'transition': TransitionType.bottomToTop,
-        //     'duration': 300,
-        //   },
-        // );
+        Navigator.pushNamed(
+          context,
+          '/post-add-screen',
+          arguments: {
+            'transition': TransitionType.bottomToTop,
+            'duration': 300,
+          },
+        );
       },
       () {
         // Navigator.pushNamed(
@@ -225,53 +226,58 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                                   ),
                                   itemCount: _bottomCards.length,
                                   itemBuilder: (context, index) {
-                                    return Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            AppColors.appGradient1,
-                                            AppColors.appGradient2
-                                          ],
-                                        ),
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                      ),
-                                      child: Material(
-                                        color: Colors.transparent,
-                                        child: InkWell(
-                                          onTap: _navigationList[index],
+                                    return GestureDetector(
+                                      onTap: () {
+                                        _navigationList[index];
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              AppColors.appGradient1,
+                                              AppColors.appGradient2
+                                            ],
+                                          ),
                                           borderRadius:
                                               BorderRadius.circular(12.0),
-                                          child: Padding(
-                                            padding: EdgeInsets.all(16.0),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                SvgPicture.asset(
-                                                  color: Colors.white,
-                                                  _bottomCards[index].svgUrl,
-                                                  height:
-                                                      constraints.maxHeight *
-                                                          0.04,
-                                                ),
-                                                SizedBox(height: 8.0),
-                                                Text(
-                                                  _bottomCards[index].label,
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily:
-                                                        "Poppins-Medium",
-                                                    fontSize:
-                                                        constraints.maxHeight *
-                                                            0.02,
+                                        ),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: InkWell(
+                                            onTap: _navigationList[index],
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            child: Padding(
+                                              padding: EdgeInsets.all(16.0),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  SvgPicture.asset(
                                                     color: Colors.white,
+                                                    _bottomCards[index].svgUrl,
+                                                    height:
+                                                        constraints.maxHeight *
+                                                            0.04,
                                                   ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ],
+                                                  SizedBox(height: 8.0),
+                                                  Text(
+                                                    _bottomCards[index].label,
+                                                    style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontFamily:
+                                                          "Poppins-Medium",
+                                                      fontSize:
+                                                          constraints.maxHeight *
+                                                              0.02,
+                                                      color: Colors.white,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

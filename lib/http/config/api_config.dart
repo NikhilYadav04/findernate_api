@@ -4,6 +4,8 @@ class ApiConfig {
   static const String _baseUrlStaging = 'https://staging-api.example.com';
   static const String _baseUrlProd = 'http://srv882174.hstgr.cloud';
 
+  static const String baseUrl2 = 'https://srv882174.hstgr.cloud';
+
   //* Current environment
   static const String currentEnvironment = 'prod';
 

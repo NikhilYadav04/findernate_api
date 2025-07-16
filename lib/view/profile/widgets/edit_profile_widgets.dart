@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:social_media_clone/controller/profile/profile_controller.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
+import 'package:social_media_clone/core/constants/places.dart';
 
 Widget profileEditAppBar(
     {required double maxHeight, required double maxWidth}) {
@@ -100,7 +101,6 @@ Widget profileEditInputField(
         key: formKey,
         child: TextFormField(
           readOnly: readOnly,
-          
           keyboardType: keyboardType,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           controller: controller,
@@ -145,6 +145,123 @@ Widget profileEditInputField(
           style: _textStyle2.copyWith(fontSize: maxHeight * 0.02),
         ),
       ));
+}
+
+Widget locationDynamicField({
+  required double maxHeight,
+  required double maxWidth,
+  required GlobalKey<FormState> formKey,
+  required TextEditingController controller,
+  required String? Function(String?)? validator,
+  TextInputType keyboardType = TextInputType.text,
+  required String key,
+  required dynamic provider,
+  required bool isError,
+}) {
+  return Container(
+    height: maxHeight * 0.065,
+    width: double.infinity,
+    child: Form(
+      key: formKey,
+      child: Autocomplete<String>(
+        optionsBuilder: (TextEditingValue textEditingValue) {
+          if (textEditingValue.text.isEmpty) {
+            return const Iterable<String>.empty();
+          }
+          return places.where((place) => place
+              .toLowerCase()
+              .contains(textEditingValue.text.toLowerCase()));
+        },
+        fieldViewBuilder:
+            (context, textController, focusNode, onFieldSubmitted) {
+          textController.text = controller.text;
+          textController.selection = controller.selection;
+          textController.addListener(() {
+            controller.text = textController.text;
+            controller.selection = textController.selection;
+          });
+          return TextFormField(
+            onChanged: (value) {
+              controller.text = value;
+             // provider.locationController = value;
+            },
+            controller: textController,
+            focusNode: focusNode,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            keyboardType: keyboardType,
+            validator: (value) {
+              final error = validator!(value);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                provider.setFieldError(key, error != null);
+              });
+              return error;
+            },
+            decoration: InputDecoration(
+              floatingLabelBehavior: FloatingLabelBehavior.never,
+              isDense: true,
+              border: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: isError ? Colors.red : Colors.grey.shade500),
+                borderRadius: BorderRadius.circular(maxHeight * 0.01),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.red),
+                borderRadius: BorderRadius.circular(maxHeight * 0.01),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: isError ? Colors.red : AppColors.appYellow),
+                borderRadius: BorderRadius.circular(maxHeight * 0.01),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: isError ? Colors.red : Colors.grey.shade500),
+                borderRadius: BorderRadius.circular(maxHeight * 0.01),
+              ),
+              filled: true,
+              fillColor: Color(0xFFF2F2F2),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: maxWidth * 0.03,
+                vertical: maxHeight * 0.018,
+              ),
+              errorStyle: TextStyle(height: 0), // Hide error text completely
+            ),
+            style: _textStyle2.copyWith(fontSize: maxHeight * 0.02),
+            onFieldSubmitted: (value) => onFieldSubmitted(),
+          );
+        },
+        onSelected: (selection) {
+          controller.text = selection;
+          provider.locationController = selection;
+          // you can update provider or mapController here
+        },
+        optionsViewBuilder: (context, onSelected, options) {
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              child: Container(
+                width: double.infinity,
+                constraints: BoxConstraints(maxHeight: 200),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: options.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    final String option = options.elementAt(index);
+                    return ListTile(
+                      title: Text(option),
+                      onTap: () {
+                        onSelected(option);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    ),
+  );
 }
 
 Widget profileEditBioField(
