@@ -21,10 +21,7 @@ List<BottomCardModel> _bottomCards = [
     svgUrl: 'assets/images/svg/ic_live.svg', // dummy local SVG path
     label: 'Go Live',
   ),
-  BottomCardModel(
-    svgUrl: 'assets/svg/camera.svg', // dummy local SVG path
-    label: 'Business',
-  ),
+ 
 ];
 
 class BottomBarScreen extends StatefulWidget {
@@ -58,35 +55,26 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
         );
       },
       () {
-        // Navigator.pushNamed(
-        //   context,
-        //   '/reel-add-screen',
-        //   arguments: {
-        //     'transition': TransitionType.bottomToTop,
-        //     'duration': 300,
-        //   },
-        // );
+        Navigator.pushNamed(
+          context,
+          '/reel-add-screen',
+          arguments: {
+            'transition': TransitionType.bottomToTop,
+            'duration': 300,
+          },
+        );
       },
       () {
-        // Navigator.pushNamed(
-        //   context,
-        //   '/reel-add-screen',
-        //   arguments: {
-        //     'transition': TransitionType.bottomToTop,
-        //     'duration': 300,
-        //   },
-        // );
+        Navigator.pushNamed(
+          context,
+          '/reel-add-screen',
+          arguments: {
+            'transition': TransitionType.bottomToTop,
+            'duration': 300,
+          },
+        );
       },
-      () {
-        // Navigator.pushNamed(
-        //   context,
-        //   '/reel-add-screen',
-        //   arguments: {
-        //     'transition': TransitionType.bottomToTop,
-        //     'duration': 300,
-        //   },
-        // );
-      },
+      
     ];
   }
 
@@ -136,7 +124,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
             return Padding(
               padding: EdgeInsets.only(bottom: constraints.maxHeight * 0.000),
               child: SizedBox(
-                height: constraints.maxHeight * 0.08,
+                height: constraints.maxHeight * 0.075,
                 width: constraints.maxWidth * 0.162,
                 child: GestureDetector(
                   onTap: () {
@@ -163,7 +151,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                                 topLeft: Radius.circular(30),
                                 topRight: Radius.circular(30),
                               )),
-                          height: constraints.maxHeight * 0.44,
+                          height: constraints.maxHeight * 0.5,
                           child: Column(
                             children: [
                               Container(
@@ -216,74 +204,170 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
 
                               // 2x2 Grid for cards
                               Expanded(
-                                child: GridView.builder(
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    crossAxisSpacing: 12.0,
-                                    mainAxisSpacing: 12.0,
-                                    childAspectRatio: 1.8,
-                                  ),
-                                  itemCount: _bottomCards.length,
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        _navigationList[index];
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              AppColors.appGradient1,
-                                              AppColors.appGradient2
-                                            ],
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                        ),
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            onTap: _navigationList[index],
-                                            borderRadius:
-                                                BorderRadius.circular(12.0),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(16.0),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  SvgPicture.asset(
-                                                    color: Colors.white,
-                                                    _bottomCards[index].svgUrl,
-                                                    height:
-                                                        constraints.maxHeight *
-                                                            0.04,
-                                                  ),
-                                                  SizedBox(height: 8.0),
-                                                  Text(
-                                                    _bottomCards[index].label,
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontFamily:
-                                                          "Poppins-Medium",
-                                                      fontSize:
-                                                          constraints.maxHeight *
-                                                              0.02,
-                                                      color: Colors.white,
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
+                                child: Column(
+                                  children: List.generate(
+                                    _bottomCards.length,
+                                    (index) => Container(
+                                      margin: EdgeInsets.only(
+                                          bottom:
+                                              constraints.maxHeight * 0.015),
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: InkWell(
+                                          onTap: _navigationList[index],
+                                          borderRadius: BorderRadius.circular(
+                                              constraints.maxWidth * 0.03),
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: EdgeInsets.all(
+                                                constraints.maxWidth * 0.035),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                                colors: [
+                                                  AppColors.appGradient1
+                                                      .withOpacity(0.9),
+                                                  AppColors.appGradient2
+                                                      .withOpacity(0.9),
                                                 ],
                                               ),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      constraints.maxWidth *
+                                                          0.03),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: AppColors.appGradient1
+                                                      .withOpacity(0.3),
+                                                  blurRadius:
+                                                      constraints.maxWidth *
+                                                          0.02,
+                                                  offset: Offset(
+                                                      0,
+                                                      constraints.maxHeight *
+                                                          0.005),
+                                                ),
+                                              ],
+                                              border: Border.all(
+                                                color: Colors.white
+                                                    .withOpacity(0.2),
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                // Icon Container
+                                                Container(
+                                                  width: constraints.maxWidth *
+                                                      0.12,
+                                                  height: constraints.maxWidth *
+                                                      0.12,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white
+                                                        .withOpacity(0.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            constraints
+                                                                    .maxWidth *
+                                                                0.025),
+                                                    border: Border.all(
+                                                      color: Colors.white
+                                                          .withOpacity(0.3),
+                                                      width: 1,
+                                                    ),
+                                                  ),
+                                                  child: Center(
+                                                    child: SvgPicture.asset(
+                                                      _bottomCards[index]
+                                                          .svgUrl,
+                                                      color: Colors.white,
+                                                      height:
+                                                          constraints.maxWidth *
+                                                              0.06,
+                                                      width:
+                                                          constraints.maxWidth *
+                                                              0.06,
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                SizedBox(
+                                                    width:
+                                                        constraints.maxWidth *
+                                                            0.04),
+
+                                                // Text Content
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        _bottomCards[index]
+                                                            .label,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontFamily:
+                                                              "Poppins-Bold",
+                                                          fontSize: constraints
+                                                                  .maxHeight *
+                                                              0.022,
+                                                          color: Colors.white,
+                                                          letterSpacing: 0.5,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                          height: constraints
+                                                                  .maxHeight *
+                                                              0.003),
+                                                      Text(
+                                                        "Tap to explore ${_bottomCards[index].label.toLowerCase()}",
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              "Poppins-Light",
+                                                          fontSize: constraints
+                                                                  .maxHeight *
+                                                              0.016,
+                                                          color: Colors.white
+                                                              .withOpacity(0.8),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+
+                                                // Arrow Icon
+                                                Container(
+                                                  width: constraints.maxWidth *
+                                                      0.08,
+                                                  height: constraints.maxWidth *
+                                                      0.08,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white
+                                                        .withOpacity(0.15),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            constraints
+                                                                    .maxWidth *
+                                                                0.02),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    color: Colors.white,
+                                                    size: constraints.maxWidth *
+                                                        0.035,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
                                         ),
                                       ),
-                                    );
-                                  },
+                                    ),
+                                  ),
                                 ),
                               ),
 

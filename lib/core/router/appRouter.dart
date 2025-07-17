@@ -15,6 +15,7 @@ import 'package:social_media_clone/view/auth/screens/welcome/welcome_register.da
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_signin.dart';
 import 'package:social_media_clone/view/bottom_bar_screen.dart';
 import 'package:social_media_clone/view/content/screens/post/post_root_screen.dart';
+import 'package:social_media_clone/view/content/screens/reel/reel_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/onboard_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/splash_screen.dart';
 import 'package:social_media_clone/view/profile/screen/image_crop_screen.dart';
@@ -171,6 +172,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       break;
     case '/post-add-screen':
       page = CreatePostScreen();
+      break;
+    case '/reel-add-screen':
+      page = CreateReelScreen();
+      break;
     default:
       page = Text("No Pages Available");
       break;

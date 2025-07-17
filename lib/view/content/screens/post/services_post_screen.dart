@@ -3,15 +3,28 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import 'package:social_media_clone/core/constants/appColors.dart';
+import 'package:social_media_clone/view/content/widgets/hashtag_card.dart';
+import 'package:social_media_clone/view/content/widgets/post-add_widgets.dart';
+import 'package:social_media_clone/view/content/widgets/reel_add_widgets.dart';
 
 // SERVICE POST SCREEN
 class ServicePostScreen extends StatefulWidget {
+  final String postType;
+  final bool isReel;
+
+  const ServicePostScreen({
+    Key? key,
+    required this.postType,
+    this.isReel = false,
+  }) : super(key: key);
+
   @override
   _ServicePostScreenState createState() => _ServicePostScreenState();
 }
 
 class _ServicePostScreenState extends State<ServicePostScreen> {
   File? selectedImage;
+  File? selectedVideo;
   final ImagePicker _picker = ImagePicker();
 
   // Basic post form controllers
@@ -30,6 +43,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
   final TextEditingController stateController = TextEditingController();
   final TextEditingController countryController = TextEditingController();
   final TextEditingController durationController = TextEditingController();
+  final TextEditingController requirementsController = TextEditingController();
 
   // Dropdown values
   String selectedCurrency = 'INR';
@@ -76,7 +90,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Add Service Post',
+          widget.isReel ? 'Add Service Reel' : 'Add Service Post',
           style: TextStyle(
             color: AppColors.black,
             fontSize: sw * 0.05,
@@ -92,17 +106,20 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Select Image(s) Section
-            _buildImageSection(sw, sh),
+            widget.isReel
+                ? buildVideoPicker(sw, sh, selectedImage, _pickVideo)
+                : PostAddWidgets.buildImagePicker(
+                    sw, sh, selectedImage, _pickImage),
 
             SizedBox(height: sh * 0.03),
 
             // Add Location Section
-            _buildLocationSection(sw, sh),
+            PostAddWidgets.buildLocationField(locationController, sw, sh),
 
             SizedBox(height: sh * 0.03),
 
             // Add Caption Section
-            _buildCaptionSection(sw, sh),
+            PostAddWidgets.buildCaptionField(captionController, sw, sh),
 
             SizedBox(height: sh * 0.03),
 
@@ -112,117 +129,33 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
             SizedBox(height: sh * 0.03),
 
             // Add hashtags Section
-            _buildHashtagsSection(sw, sh),
+            HashtagInputWidget(
+              initialHashtags: hashtags,
+              onHashtagsChanged: (updatedHashtags) {
+                setState(() {
+                  hashtags = updatedHashtags;
+                });
+              },
+            ),
 
             SizedBox(height: sh * 0.03),
 
-            // Select Post Category Section
-            _buildCategorySection(sw, sh),
+            PostAddWidgets.buildPostCategorySection(
+                selectedPostCategory, sw, sh, (String? newValue) {
+              setState(() {
+                selectedPostCategory = newValue!;
+              });
+            }),
 
             SizedBox(height: sh * 0.05),
 
             // Upload Button
-            _buildUploadButton(sw, sh),
+            PostAddWidgets.buildCreateButton(sw, sh, () {}),
 
             SizedBox(height: sh * 0.03),
           ],
         ),
       ),
-    );
-  }
-
-  // Select Image(s) Section
-  Widget _buildImageSection(double sw, double sh) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Select Image(s)',
-          style: TextStyle(
-            fontSize: sh * 0.02,
-            fontFamily: 'Poppins-Medium',
-            fontWeight: FontWeight.w500,
-            color: AppColors.black,
-          ),
-        ),
-        SizedBox(height: sh * 0.015),
-        GestureDetector(
-          onTap: _pickImage,
-          child: Container(
-            width: double.infinity,
-            height: sh * 0.25,
-            decoration: BoxDecoration(
-              color: AppColors.lightGrey,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.appGradient1, width: 2),
-            ),
-            child: selectedImage == null
-                ? Center(
-                    child: Container(
-                      width: sw * 0.15,
-                      height: sw * 0.15,
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border:
-                            Border.all(color: AppColors.appGradient1, width: 2),
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        color: AppColors.appGradient1,
-                        size: sw * 0.08,
-                      ),
-                    ),
-                  )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(selectedImage!, fit: BoxFit.cover),
-                  ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Add Location Section
-  Widget _buildLocationSection(double sw, double sh) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Add Location',
-          style: TextStyle(
-            fontSize: sh * 0.02,
-            fontFamily: 'Poppins-Medium',
-            fontWeight: FontWeight.w500,
-            color: AppColors.black,
-          ),
-        ),
-        SizedBox(height: sh * 0.015),
-        _buildTextField(locationController, 'Enter location...', sw, sh,
-            label: 'Location'),
-      ],
-    );
-  }
-
-  // Add Caption Section
-  Widget _buildCaptionSection(double sw, double sh) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Add Caption',
-          style: TextStyle(
-            fontSize: sh * 0.02,
-            fontFamily: 'Poppins-Medium',
-            fontWeight: FontWeight.w500,
-            color: AppColors.black,
-          ),
-        ),
-        SizedBox(height: sh * 0.015),
-        _buildTextField(captionController, 'Write your caption...', sw, sh,
-            maxLines: 3, label: 'Caption'),
-      ],
     );
   }
 
@@ -379,6 +312,11 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
               ),
               _buildServiceFieldWithLabel(
                   'Country', countryController, 'Enter country', sw, sh),
+              SizedBox(
+                height: sh * 0.005,
+              ),
+              _buildServiceFieldWithLabel(
+                  'Requirements', requirementsController, 'Enter requirements for your services', sw, sh),
             ],
           ),
         ],
@@ -406,7 +344,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField(controller, hint, sw, sh,
+        PostAddWidgets.buildTextField(controller, hint, sw, sh,
             maxLines: maxLines, label: label, prefixIcon: _getCurrencyIcon()),
         SizedBox(height: sh * 0.015),
       ],
@@ -420,7 +358,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField(controller, hint, sw, sh,
+        PostAddWidgets.buildTextField(controller, hint, sw, sh,
             maxLines: maxLines, label: label),
         SizedBox(height: sh * 0.015),
       ],
@@ -642,319 +580,6 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
     );
   }
 
-  // Reusable TextField with proper styling and labels
-  Widget _buildTextField(
-      TextEditingController controller, String hint, double sw, double sh,
-      {int maxLines = 1, String? label, Widget? prefixIcon}) {
-    return Container(
-      height: maxLines == 1 ? sh * 0.065 : null,
-      child: TextField(
-        textAlignVertical: TextAlignVertical.top,
-        controller: controller,
-        maxLines: maxLines,
-        style: TextStyle(
-          fontSize: sh * 0.018,
-          fontFamily: 'Poppins-Medium',
-          color: AppColors.black,
-        ),
-        decoration: InputDecoration(
-          labelText: label,
-          floatingLabelAlignment: FloatingLabelAlignment.start,
-          labelStyle: TextStyle(
-            color: Colors.grey.shade700,
-            fontSize: sh * 0.02,
-            fontFamily: 'Poppins-Medium',
-          ),
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: Colors.grey.shade700,
-            fontSize: sh * 0.018,
-            fontFamily: 'Poppins-Light',
-          ),
-          prefixIcon: prefixIcon,
-          errorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.errorColor, width: 2.0),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          border: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade500, width: 1.0),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: AppColors.yellowAccent, width: 2.0),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey.shade500, width: 1.0),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          filled: true,
-          fillColor: AppColors.lightGrey,
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: sw * 0.04, vertical: sh * 0.02),
-        ),
-      ),
-    );
-  }
-
-  // Add hashtags Section
-  // Add hashtags Section
-  Widget _buildHashtagsSection(double sw, double sh) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Add hashtags',
-          style: TextStyle(
-            fontSize: sh * 0.02,
-            fontFamily: 'Poppins-Medium',
-            fontWeight: FontWeight.w500,
-            color: AppColors.black,
-          ),
-        ),
-        SizedBox(height: sh * 0.015),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(sw * 0.04),
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade500, width: 1),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: hashtagController,
-                      decoration: InputDecoration(
-                        labelText: 'Add hashtag',
-                        labelStyle: TextStyle(
-                          fontSize: sh * 0.018,
-                          fontFamily: 'Poppins-Medium',
-                        ),
-                        hintText: 'Enter hashtag (without #)',
-                        hintStyle: TextStyle(
-                          fontSize: sh * 0.016,
-                          fontFamily: 'Poppins-Light',
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              BorderSide(color: Colors.grey.shade500, width: 1),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(
-                              color: AppColors.yellowAccent, width: 2),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: sw * 0.03, vertical: sh * 0.015),
-                      ),
-                      style: TextStyle(
-                        fontSize: sh * 0.018,
-                        fontFamily: 'Poppins-Light',
-                      ),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty && !hashtags.contains(value)) {
-                          setState(() {
-                            hashtags.add(value);
-                            hashtagController.clear();
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                  SizedBox(width: sw * 0.02),
-                  ElevatedButton(
-                    onPressed: () {
-                      String hashtag = hashtagController.text.trim();
-                      if (hashtag.isNotEmpty && !hashtags.contains(hashtag)) {
-                        setState(() {
-                          hashtags.add(hashtag);
-                          hashtagController.clear();
-                        });
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.yellowAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Add',
-                      style: TextStyle(
-                        color: AppColors.black,
-                        fontSize: sh * 0.018,
-                        fontFamily: 'Poppins-Medium',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: sh * 0.015),
-              if (hashtags.isNotEmpty) ...[
-                Text(
-                  'Added Hashtags:',
-                  style: TextStyle(
-                    fontSize: sh * 0.018,
-                    fontFamily: 'Poppins-Medium',
-                    color: AppColors.black,
-                  ),
-                ),
-                SizedBox(height: sh * 0.01),
-                Wrap(
-                  spacing: sw * 0.02,
-                  runSpacing: sh * 0.01,
-                  children: hashtags
-                      .map((hashtag) => _buildHashtagChip(hashtag, sw, sh))
-                      .toList(),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Hashtag Chip
-  Widget _buildHashtagChip(String hashtag, double sw, double sh) {
-    return Container(
-      padding:
-          EdgeInsets.symmetric(horizontal: sw * 0.03, vertical: sh * 0.008),
-      decoration: BoxDecoration(
-        color: AppColors.orangeAccent,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '#$hashtag',
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: sh * 0.02,
-              fontFamily: 'Poppins-Medium',
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(width: sw * 0.015),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                hashtags.remove(hashtag);
-              });
-            },
-            child: Container(
-              width: sw * 0.04,
-              height: sw * 0.04,
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.close,
-                color: AppColors.orangeAccent,
-                size: sh * 0.015,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Select Post Category Section
-  Widget _buildCategorySection(double sw, double sh) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Select Post Category',
-          style: TextStyle(
-            fontSize: sh * 0.02,
-            fontFamily: 'Poppins-Medium',
-            fontWeight: FontWeight.w500,
-            color: AppColors.black,
-          ),
-        ),
-        SizedBox(height: sh * 0.015),
-        Container(
-          width: double.infinity,
-          height: sh * 0.065,
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade500, width: 1),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: selectedPostCategory,
-              isExpanded: true,
-              icon: Icon(Icons.keyboard_arrow_down,
-                  color: AppColors.black, size: sh * 0.025),
-              style: TextStyle(
-                color: AppColors.black,
-                fontSize: sh * 0.022,
-                fontFamily: 'Poppins-Light',
-              ),
-              items: ['Personal Life', 'Business', 'Service', 'Product']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
-                    child: Text(value),
-                  ),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedPostCategory = newValue!;
-                });
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Upload Button
-  Widget _buildUploadButton(double sw, double sh) {
-    return Container(
-      width: double.infinity,
-      height: sh * 0.07,
-      decoration: BoxDecoration(
-        color: AppColors.orangeAccent,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ElevatedButton(
-        onPressed: _submitPost,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-        ),
-        child: Text(
-          'Create',
-          style: TextStyle(
-            color: AppColors.white,
-            fontSize: sh * 0.022,
-            fontFamily: 'Poppins-Bold',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
   // Image picker functionality
   void _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -965,62 +590,13 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
     }
   }
 
-  // Submit form data
-  void _submitPost() {
-    // Create service JSON object from individual fields
-    // Map<String, dynamic> serviceData = {
-    //   'name': serviceNameController.text,
-    //   'description': serviceDescriptionController.text,
-    //   'price': priceController.text,
-    //   'currency': selectedCurrency,
-    //   'category': selectedCategory,
-    //   'subcategory': selectedSubCategory,
-    //   'duration': durationController.text,
-    //   'serviceType': selectedServiceType,
-    //   'availability': selectedAvailability,
-    //   'schedule': scheduleData,
-    //   'timezone': 'Asia/Kolkata',
-    //   'location': {
-    //     'address': addressController.text,
-    //     'city': placeController.text,
-    //     'state': stateController.text,
-    //     'country': countryController.text,
-    //   },
-    //   'hashtags': hashtags,
-    // };
-
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Service post created successfully!',
-          style: TextStyle(fontFamily: 'Poppins-Medium'),
-        ),
-        backgroundColor: AppColors.orangeAccent,
-        duration: Duration(seconds: 3),
-      ),
-    );
-
-    // Navigate back
-    Navigator.pop(context);
-  }
-
-  @override
-  void dispose() {
-    // Clean up controllers
-    locationController.dispose();
-    captionController.dispose();
-    mentionsController.dispose();
-    settingsController.dispose();
-    serviceNameController.dispose();
-    serviceDescriptionController.dispose();
-    priceController.dispose();
-    addressController.dispose();
-    placeController.dispose();
-    stateController.dispose();
-    countryController.dispose();
-    durationController.dispose();
-    hashtagController.dispose();
-    super.dispose();
+  //* Video Picker Functionality
+  void _pickVideo() async {
+    final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
+    if (video != null) {
+      setState(() {
+        selectedVideo = File(video.path);
+      });
+    }
   }
 }

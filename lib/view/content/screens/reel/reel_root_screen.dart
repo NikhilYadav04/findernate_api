@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
+import 'package:social_media_clone/view/content/screens/post/business_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/normal_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/product_post_screen.dart';
 import 'package:social_media_clone/view/content/screens/post/services_post_screen.dart';
-import 'normal_post_screen.dart';
-import 'business_post_screen.dart';
 
-import 'product_post_screen.dart';
+// Reel Type Enum
+enum ReelType { normal, business, service, product }
 
-
-
-// Post Type Enum
-enum PostType { normal, business, service, product }
-
-// ROOT SCREEN - Main Create Post Screen with Interactive Cards
-class CreatePostScreen extends StatefulWidget {
+// ROOT SCREEN - Main Create Reel Screen with Interactive Cards
+class CreateReelScreen extends StatefulWidget {
   @override
-  _CreatePostScreenState createState() => _CreatePostScreenState();
+  _CreateReelScreenState createState() => _CreateReelScreenState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen>
+class _CreateReelScreenState extends State<CreateReelScreen>
     with TickerProviderStateMixin {
-  PostType? selectedPostType;
+  ReelType? selectedReelType;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -58,7 +55,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Create Post',
+          'Create Reel',
           style: TextStyle(
             color: AppColors.black,
             fontSize: sh * 0.025,
@@ -85,7 +82,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Select Post Type',
+                'Select Reel Type',
                 style: TextStyle(
                   fontSize: sh * 0.022,
                   fontFamily: 'Poppins-Bold',
@@ -95,12 +92,12 @@ class _CreatePostScreenState extends State<CreatePostScreen>
               ),
               SizedBox(height: sh * 0.025),
 
-              // Post Type Cards
-              _buildPostTypeCard(
-                PostType.normal,
-                'Normal Post',
-                'Share your daily moments and thoughts',
-                Icons.photo_camera,
+              // Reel Type Cards
+              _buildReelTypeCard(
+                ReelType.normal,
+                'Entertainment Reel',
+                'Share fun videos, trends, and entertainment',
+                Icons.videocam,
                 AppColors.appGradient1,
                 sw,
                 sh,
@@ -108,11 +105,11 @@ class _CreatePostScreenState extends State<CreatePostScreen>
 
               SizedBox(height: sh * 0.02),
 
-              _buildPostTypeCard(
-                PostType.business,
-                'Business',
-                'Make business announcements and updates',
-                Icons.business,
+              _buildReelTypeCard(
+                ReelType.business,
+                'Business Reel',
+                'Promote your business with engaging videos',
+                Icons.business_center,
                 AppColors.orangeAccent,
                 sw,
                 sh,
@@ -120,11 +117,11 @@ class _CreatePostScreenState extends State<CreatePostScreen>
 
               SizedBox(height: sh * 0.02),
 
-              _buildPostTypeCard(
-                PostType.service,
-                'Service',
-                'Offer your services with detailed information',
-                Icons.room_service,
+              _buildReelTypeCard(
+                ReelType.service,
+                'Service Reel',
+                'Showcase your services with video demos',
+                Icons.build,
                 AppColors.yellowAccent,
                 sw,
                 sh,
@@ -132,11 +129,11 @@ class _CreatePostScreenState extends State<CreatePostScreen>
 
               SizedBox(height: sh * 0.02),
 
-              _buildPostTypeCard(
-                PostType.product,
-                'Product',
-                'Showcase and sell your products',
-                Icons.shopping_bag,
+              _buildReelTypeCard(
+                ReelType.product,
+                'Product Reel',
+                'Create product demos and unboxing videos',
+                Icons.inventory,
                 AppColors.appGradient2,
                 sw,
                 sh,
@@ -146,7 +143,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
               Spacer(),
 
               // Continue Button
-              if (selectedPostType != null) _buildContinueButton(sw, sh),
+              if (selectedReelType != null) _buildContinueButton(sw, sh),
 
               SizedBox(height: sh * 0.02),
             ],
@@ -156,9 +153,9 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     );
   }
 
-  Widget _buildPostTypeCard(PostType type, String title, String description,
+  Widget _buildReelTypeCard(ReelType type, String title, String description,
       IconData icon, Color accentColor, double sw, double sh) {
-    bool isSelected = selectedPostType == type;
+    bool isSelected = selectedReelType == type;
 
     return GestureDetector(
       onTapDown: (_) => _animationController.forward(),
@@ -166,7 +163,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
       onTapCancel: () => _animationController.reverse(),
       onTap: () {
         setState(() {
-          selectedPostType = type;
+          selectedReelType = type;
         });
         // Add haptic feedback
         // HapticFeedback.lightImpact();
@@ -175,7 +172,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
         animation: _scaleAnimation,
         builder: (context, child) {
           return Transform.scale(
-            scale: selectedPostType == type ? _scaleAnimation.value : 1.0,
+            scale: selectedReelType == type ? _scaleAnimation.value : 1.0,
             child: AnimatedContainer(
               duration: Duration(milliseconds: 300),
               curve: Curves.easeInOut,
@@ -227,7 +224,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
                     ),
                     child: Icon(
                       icon,
-                      color: isSelected ? accentColor : Colors.grey.shade700,
+                      color: isSelected ? accentColor : AppColors.grey,
                       size: sw * 0.08,
                     ),
                   ),
@@ -256,7 +253,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
                             fontFamily: 'Poppins-Light',
                             color: isSelected
                                 ? accentColor.withOpacity(0.8)
-                                : Colors.grey.shade800,
+                                : AppColors.grey,
                           ),
                         ),
                       ],
@@ -296,10 +293,10 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   Widget _buildContinueButton(double sw, double sh) {
     return AnimatedOpacity(
       duration: Duration(milliseconds: 500),
-      opacity: selectedPostType != null ? 1.0 : 0.0,
+      opacity: selectedReelType != null ? 1.0 : 0.0,
       child: AnimatedSlide(
         duration: Duration(milliseconds: 500),
-        offset: selectedPostType != null ? Offset.zero : Offset(0, 0.5),
+        offset: selectedReelType != null ? Offset.zero : Offset(0, 0.5),
         child: Container(
           width: double.infinity,
           height: sh * 0.07,
@@ -317,9 +314,9 @@ class _CreatePostScreenState extends State<CreatePostScreen>
             ],
           ),
           child: ElevatedButton(
-            onPressed: selectedPostType != null
+            onPressed: selectedReelType != null
                 ? () {
-                    _navigateToPostScreen();
+                    _navigateToReelScreen();
                   }
                 : null,
             style: ElevatedButton.styleFrom(
@@ -355,22 +352,22 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     );
   }
 
-  void _navigateToPostScreen() {
-    if (selectedPostType == null) return;
+  void _navigateToReelScreen() {
+    if (selectedReelType == null) return;
 
     Widget targetScreen;
-    switch (selectedPostType!) {
-      case PostType.normal:
-        targetScreen = NormalPostScreen(postType: "image",isReel: false,);
+    switch (selectedReelType!) {
+      case ReelType.normal:
+        targetScreen = NormalPostScreen(postType: "video",isReel: true,);
         break;
-      case PostType.business:
-        targetScreen = BusinessPostScreen(postType: "image",isReel: false);
+      case ReelType.business:
+        targetScreen = BusinessPostScreen(postType: "video",isReel: true,);
         break;
-      case PostType.service:
-        targetScreen = ServicePostScreen(postType: "image",isReel: false);
+      case ReelType.service:
+        targetScreen = ServicePostScreen(postType: "video",isReel: true,);
         break;
-      case PostType.product:
-        targetScreen = ProductPostScreen(postType: "image",isReel: false);
+      case ReelType.product:
+        targetScreen = ProductPostScreen(postType: "video",isReel: true,);
         break;
     }
 
