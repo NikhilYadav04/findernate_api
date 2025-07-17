@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'dart:io';
 
 import 'package:social_media_clone/core/constants/appColors.dart';
-import 'package:social_media_clone/view/content/widgets/hashtag_card.dart';
-import 'package:social_media_clone/view/content/widgets/post-add_widgets.dart';
-import 'package:social_media_clone/view/content/widgets/reel_add_widgets.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
+import 'package:social_media_clone/http/services/post_services.dart';
+import 'package:social_media_clone/view/content/widgets/add/hashtag_card.dart';
+import 'package:social_media_clone/view/content/widgets/add/post-add_widgets.dart';
+import 'package:social_media_clone/view/content/widgets/add/reel_add_widgets.dart';
 
 // PRODUCT POST SCREEN
 class ProductPostScreen extends StatefulWidget {
@@ -42,16 +46,151 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
 
   // Mood and Activity dropdowns
   String selectedMood = 'Excited';
-  String selectedActivity = 'Promotion';
+  String selectedActivity = 'Relaxing';
 
   // Hashtags and category
   List<String> hashtags = [];
   String selectedPostCategory = 'Personal Life';
   final TextEditingController hashtagController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
+  //* handle product post API Call
+  final PostService _postService = PostService();
+  bool _isLoading = false;
+
+  void _handleProductPost() async {
+    if (!_validateProductForm()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      File? mediaFile = widget.isReel ? selectedVideo : selectedImage;
+
+      if (mediaFile == null) {
+        showSnackBar(
+            'Please select ${widget.isReel ? 'a video' : 'an image'}', context,
+            isError: true);
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      Map<String, dynamic> productData = {
+        "name": productNameController.text.trim(),
+        "price": priceController.text.trim(),
+        "currency": selectedCurrency,
+        "inStock": isInStock,
+      };
+
+      Map<String, dynamic> settingsData = {
+        "visibility": "public",
+        "allowComments": true,
+        "allowLikes": true,
+      };
+
+      Map<String, String> locationData = {
+        "name": locationController.text.trim().isEmpty
+            ? "Unknown Location"
+            : locationController.text.trim()
+      };
+
+      List<String> mentions = [];
+
+      final response = await _postService.createProductPost(
+        media: mediaFile,
+        postType: widget.isReel ? "reel" : "photo",
+        caption: captionController.text.trim(),
+        description: descriptionController.text.trim(),
+        mentions: mentions,
+        mood: selectedMood,
+        activity: selectedActivity,
+        tags: hashtags,
+        settings: settingsData,
+        location: locationData,
+        product: productData,
+        status: "published",
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (response.success) {
+        showSnackBar(
+            widget.isReel
+                ? 'Product Reel created successfully!'
+                : 'Product Post created successfully!',
+            context,
+            isError: false);
+        _clearProductForm();
+        Navigator.pop(context);
+      } else {
+        showSnackBar(response.message, context, isError: true);
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBar('An error occurred: ${e.toString()}', context,
+          isError: true);
+    }
+  }
+
+  bool _validateProductForm() {
+    if (widget.isReel && selectedVideo == null) {
+      showSnackBar('Please select a video', context, isError: true);
+      return false;
+    }
+
+    if (!widget.isReel && selectedImage == null) {
+      showSnackBar('Please select an image', context, isError: true);
+      return false;
+    }
+
+    if (productNameController.text.trim().isEmpty) {
+      showSnackBar('Please enter product name', context, isError: true);
+      return false;
+    }
+
+    if (priceController.text.trim().isEmpty) {
+      showSnackBar('Please enter product price', context, isError: true);
+      return false;
+    }
+
+    try {
+      double price = double.parse(priceController.text.trim());
+      if (price < 0) {
+        showSnackBar('Price cannot be negative', context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      showSnackBar('Please enter a valid price', context, isError: true);
+      return false;
+    }
+
+    return true;
+  }
+
+  void _clearProductForm() {
+    setState(() {
+      selectedImage = null;
+      selectedVideo = null;
+      captionController.clear();
+      descriptionController.clear();
+      locationController.clear();
+      productNameController.clear();
+      priceController.clear();
+      hashtags.clear();
+      selectedCurrency = 'INR';
+      isInStock = true;
+      selectedMood = 'Excited';
+      selectedActivity = 'Promotion';
+      selectedPostCategory = 'Personal Life';
+    });
   }
 
   @override
@@ -88,7 +227,11 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
           children: [
             // Select Image(s) Section
             widget.isReel
-                ? buildVideoPicker(sw, sh, selectedImage, _pickVideo)
+                ? VideoPickerWidget(
+                    sw: sw,
+                    sh: sh,
+                    selectedVideo: selectedImage,
+                    onTap: _pickVideo)
                 : PostAddWidgets.buildImagePicker(
                     sw, sh, selectedImage, _pickImage),
 
@@ -143,7 +286,16 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
             SizedBox(height: sh * 0.05),
 
             // Create Button
-            PostAddWidgets.buildCreateButton(sw, sh, () {}),
+            _isLoading
+                ? Center(
+                    child: SpinKitCircle(
+                      color: AppColors.appGradient1,
+                      size: 35,
+                    ),
+                  )
+                : PostAddWidgets.buildCreateButton(sw, sh, () {
+                    Logger().d(hashtags);
+                  }),
 
             SizedBox(height: sh * 0.03),
           ],
@@ -172,13 +324,28 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Product Details',
-            style: TextStyle(
-              fontSize: sh * 0.022,
-              fontFamily: 'Poppins-Bold',
-              fontWeight: FontWeight.bold,
-              color: AppColors.black,
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Product Details',
+                  style: TextStyle(
+                    fontSize: sh * 0.022,
+                    fontFamily: 'Poppins-Bold',
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    fontSize: sh * 0.022,
+                    fontFamily: 'Poppins-Bold',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: sh * 0.02),
@@ -250,16 +417,16 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
               'Mood',
               selectedMood,
               [
-                'Excited',
-                'Proud',
-                'Confident',
-                'Enthusiastic',
-                'Motivated',
                 'Happy',
+                'Excited',
                 'Grateful',
-                'Satisfied',
+                'Motivated',
+                'Relaxed',
+                'Confident',
+                'Inspired',
+                'Peaceful',
                 'Energetic',
-                'Optimistic'
+                'Content'
               ],
               sw,
               sh, (value) {
@@ -274,16 +441,16 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
               'Activity',
               selectedActivity,
               [
-                'Promotion',
-                'Marketing',
-                'Selling',
-                'Advertising',
-                'Launching',
-                'Showcasing',
-                'Announcing',
-                'Introducing',
-                'Presenting',
-                'Offering'
+                'Traveling',
+                'Working',
+                'Relaxing',
+                'Exercising',
+                'Cooking',
+                'Reading',
+                'Shopping',
+                'Studying',
+                'Socializing',
+                'Creating'
               ],
               sw,
               sh, (value) {

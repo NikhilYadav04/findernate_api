@@ -14,7 +14,8 @@ import 'package:social_media_clone/view/auth/screens/signin/sign_in_page.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_register.dart';
 import 'package:social_media_clone/view/auth/screens/welcome/welcome_signin.dart';
 import 'package:social_media_clone/view/bottom_bar_screen.dart';
-import 'package:social_media_clone/view/content/screens/post/post_root_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/post_root_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/display/normal_post_display.dart';
 import 'package:social_media_clone/view/content/screens/reel/reel_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/onboard_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/splash_screen.dart';
@@ -100,8 +101,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   Widget page;
   switch (settings.name) {
     case '/':
-      page = SplashScreen();
-      //page = AuthTestingPage();
+      //page = SplashScreen();
+      page = UniversalPostDemo();
       break;
     case '/onboard':
       page = OnboardRootScreen();

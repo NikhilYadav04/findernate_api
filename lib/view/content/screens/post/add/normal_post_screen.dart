@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'dart:io';
 
 import 'package:social_media_clone/core/constants/appColors.dart';
-import 'package:social_media_clone/view/content/widgets/hashtag_card.dart';
-import 'package:social_media_clone/view/content/widgets/post-add_widgets.dart';
-import 'package:social_media_clone/view/content/widgets/reel_add_widgets.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
+import 'package:social_media_clone/http/services/post_services.dart';
+import 'package:social_media_clone/view/content/widgets/add/hashtag_card.dart';
+import 'package:social_media_clone/view/content/widgets/add/post-add_widgets.dart';
+import 'package:social_media_clone/view/content/widgets/add/reel_add_widgets.dart';
 
 // NORMAL POST SCREEN
 class NormalPostScreen extends StatefulWidget {
@@ -27,6 +31,9 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
   File? selectedVideo;
   final ImagePicker _picker = ImagePicker();
 
+  //* postservice
+  final PostService _postService = PostService();
+
   // Normal post form controllers - Updated fields
   final TextEditingController captionController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -35,6 +42,7 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
   // Dropdown values for mood and activity
   String selectedMood = 'Happy';
   String selectedActivity = 'Relaxing';
+  bool _isLoading = false;
 
   // Hashtags and category
   List<String> hashtags = [];
@@ -44,6 +52,134 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void _handleNormalPost() async {
+    // Validation
+    if (!_validateForm()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      File? mediaFile = widget.isReel ? selectedVideo : selectedImage;
+
+      if (mediaFile == null) {
+        showSnackBar(
+            'Please select ${widget.isReel ? 'a video' : 'an image'}', context,
+            isError: true);
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Prepare location data
+      Map<String, String> locationData = {
+        "name": locationController.text.trim().isEmpty
+            ? "Unknown Location"
+            : locationController.text.trim()
+      };
+
+      // Prepare settings data
+      Map<String, dynamic> settingsData = {
+        "visibility": "public",
+        "allowComments": true,
+        "allowLikes": true
+      };
+
+      // Prepare mentions (empty for now, you can add functionality later)
+      List<String> mentions = [];
+
+      // Make API call
+      final response = await _postService.createNormalPost(
+        media: mediaFile,
+        postType: widget.isReel ? "reel" : "photo",
+        caption: captionController.text.isEmpty
+            ? ""
+            : captionController.text.toString(),
+        description: descriptionController.text.trim().isEmpty
+            ? ""
+            : descriptionController.text.toString(),
+        mood: selectedMood,
+        activity: selectedActivity,
+        location: locationData,
+        tags: hashtags,
+        mentions: mentions,
+        settings: settingsData,
+        status: "published",
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (response.success) {
+        // Success handling
+        showSnackBar(
+            widget.isReel
+                ? 'Reel created successfully!'
+                : 'Post created successfully!',
+            context,
+            isError: false);
+        _clearForm();
+        Logger().d(response.data);
+
+        // Optional: Navigate back after successful post creation
+        Navigator.pop(context);
+      } else {
+        // Error handling
+        showSnackBar(response.message, context, isError: true);
+      }
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBar('An error occurred: ${e.toString()}', context,
+          isError: true);
+      return;
+    }
+  }
+
+  bool _validateForm() {
+    if (widget.isReel && selectedVideo == null) {
+      showSnackBar('Please select a video', context, isError: true);
+      return false;
+    }
+
+    if (!widget.isReel && selectedImage == null) {
+      showSnackBar('Please select an image', context, isError: true);
+      return false;
+    }
+
+    // Optional: Add more validation rules
+    if (captionController.text.trim().isEmpty) {
+      showSnackBar('Please add a caption', context, isError: true);
+      return false;
+    }
+
+    return true;
+  }
+
+  void _clearForm() {
+    setState(() {
+      selectedImage = null;
+      selectedVideo = null;
+      captionController.clear();
+      descriptionController.clear();
+      locationController.clear();
+      hashtags.clear();
+      selectedMood = 'Happy';
+      selectedActivity = 'Relaxing';
+      selectedPostCategory = 'Personal Life';
+    });
   }
 
   @override
@@ -80,7 +216,11 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
           children: [
             // Select Image(s) Section
             widget.isReel
-                ? buildVideoPicker(sw, sh, selectedImage, _pickVideo)
+                ? VideoPickerWidget(
+                    sw: sw,
+                    sh: sh,
+                    selectedVideo: selectedImage,
+                    onTap: _pickVideo)
                 : PostAddWidgets.buildImagePicker(
                     sw, sh, selectedImage, _pickImage),
 
@@ -130,7 +270,14 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
             SizedBox(height: sh * 0.05),
 
             // Create Button
-            PostAddWidgets.buildCreateButton(sw, sh, () {}),
+            _isLoading
+                ? Center(
+                    child: SpinKitCircle(
+                      color: AppColors.appGradient1,
+                      size: 35,
+                    ),
+                  )
+                : PostAddWidgets.buildCreateButton(sw, sh, _handleNormalPost),
 
             SizedBox(height: sh * 0.03),
           ],
@@ -180,14 +327,14 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
                     [
                       'Happy',
                       'Excited',
-                      'Relaxed',
                       'Grateful',
                       'Motivated',
+                      'Relaxed',
+                      'Confident',
+                      'Inspired',
                       'Peaceful',
                       'Energetic',
-                      'Content',
-                      'Inspired',
-                      'Joyful'
+                      'Content'
                     ],
                     sw,
                     sh, (value) {
@@ -202,16 +349,16 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
                     'Activity',
                     selectedActivity,
                     [
-                      'Relaxing',
-                      'Working',
                       'Traveling',
+                      'Working',
+                      'Relaxing',
                       'Exercising',
                       'Cooking',
                       'Reading',
                       'Shopping',
                       'Studying',
                       'Socializing',
-                      'Gaming'
+                      'Creating'
                     ],
                     sw,
                     sh, (value) {
@@ -414,8 +561,7 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
       setState(() {
         selectedVideo = File(video.path);
       });
+      print(selectedVideo);
     }
   }
-
-  
 }

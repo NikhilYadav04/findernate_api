@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
-import 'package:social_media_clone/view/content/screens/post/business_post_screen.dart';
-import 'package:social_media_clone/view/content/screens/post/normal_post_screen.dart';
-import 'package:social_media_clone/view/content/screens/post/product_post_screen.dart';
-import 'package:social_media_clone/view/content/screens/post/services_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/business_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/normal_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/product_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/services_post_screen.dart';
 
 // Reel Type Enum
 enum ReelType { normal, business, service, product }

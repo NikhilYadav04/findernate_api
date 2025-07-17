@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
-import 'package:social_media_clone/view/content/screens/post/services_post_screen.dart';
-import 'normal_post_screen.dart';
-import 'business_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/business_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/normal_post_screen.dart';
+import 'package:social_media_clone/view/content/screens/post/add/services_post_screen.dart';
 
 import 'product_post_screen.dart';
 

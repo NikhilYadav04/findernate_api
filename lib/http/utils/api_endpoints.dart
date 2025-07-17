@@ -24,4 +24,18 @@ class ApiEndpoints {
       '${ApiConfig.baseUrl}/api/v1/users/profile';
   static String get uploadProfilePhoto =>
       '${ApiConfig.baseUrl2}/api/v1/users/profile/upload-image';
+
+  //* Post Creation Endpoints
+  static String get createPost =>
+      '${ApiConfig.baseUrl}/api/v1/posts/create/normal';
+  static String get createBusinessPost =>
+      '${ApiConfig.baseUrl}/api/v1/posts/create/product';
+  static String get createServicePost =>
+      '${ApiConfig.baseUrl}/api/v1/posts/create/service';
+  static String get createProductPost =>
+      '${ApiConfig.baseUrl}/api/v1/posts/create/business';
+
+  //* Home Feed
+  static String get HomeFeedPosts =>
+      '${ApiConfig.baseUrl}/api/v1/posts/home-feed';
 }

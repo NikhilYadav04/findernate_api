@@ -32,13 +32,23 @@ class PostAddWidgets {
           color: AppColors.black,
         ),
         decoration: InputDecoration(
-          labelText: label,
-          floatingLabelAlignment: FloatingLabelAlignment.start,
-          labelStyle: TextStyle(
-            color: Colors.grey.shade700,
-            fontSize: sh * 0.02,
-            fontFamily: 'Poppins-Medium',
+          // labelText: label,
+          label: Text(
+            textAlign: TextAlign.start,
+            label!,
+            style: TextStyle(
+              color: Colors.grey.shade700,
+              fontSize: sh * 0.02,
+              fontFamily: 'Poppins-Medium',
+            ),
           ),
+          floatingLabelAlignment: FloatingLabelAlignment.start,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          // labelStyle: TextStyle(
+          //   color: Colors.grey.shade700,
+          //   fontSize: sh * 0.02,
+          //   fontFamily: 'Poppins-Medium',
+          // ),
           hintText: hint,
           hintStyle: TextStyle(
             color: Colors.grey.shade700,
@@ -410,8 +420,20 @@ class PostAddWidgets {
                 fontSize: sh * 0.022,
                 fontFamily: 'Poppins-Light',
               ),
-              items: ['Personal Life', 'Business', 'Service', 'Product']
-                  .map<DropdownMenuItem<String>>((String value) {
+              items: [
+                'Personal Life',
+                'Travel',
+                'Food & Dining',
+                'Fashion & Style',
+                'Health & Fitness',
+                'Technology',
+                'Art & Culture',
+                'Sports',
+                'Entertainment',
+                'Education',
+                'Business',
+                'Other'
+              ].map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Padding(
@@ -433,11 +455,8 @@ class PostAddWidgets {
   // ===========================================
 
   static Widget buildImagePicker(
-    double sw,
-    double sh,
-    File? selectedImage,
-    VoidCallback onTap,
-  ) {
+      double sw, double sh, File? selectedImage, VoidCallback onTap,
+      {int limit = 3}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -455,33 +474,146 @@ class PostAddWidgets {
           onTap: onTap,
           child: Container(
             width: double.infinity,
-            height: sh * 0.25,
+            height: selectedImage == null ? sh * 0.3 : sh * 0.45,
             decoration: BoxDecoration(
               color: AppColors.lightGrey,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.appGradient1, width: 2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.grey.shade500,
+                width: 1.0,
+              ),
             ),
             child: selectedImage == null
-                ? Center(
-                    child: Container(
-                      width: sw * 0.15,
-                      height: sw * 0.15,
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border:
-                            Border.all(color: AppColors.appGradient1, width: 2),
-                      ),
-                      child: Icon(
-                        Icons.add,
-                        color: AppColors.appGradient1,
-                        size: sw * 0.08,
-                      ),
+                ? Padding(
+                    padding: EdgeInsets.all(sw * 0.04),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Camera Icon - Bigger and Darker
+                        Container(
+                          width: sw * 0.16,
+                          height: sw * 0.16,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.camera_alt_outlined,
+                            color: Colors.grey.shade600,
+                            size: sw * 0.08,
+                          ),
+                        ),
+                        SizedBox(height: sh * 0.02),
+
+                        // Title - Darker
+                        Text(
+                          'Add Photos',
+                          style: TextStyle(
+                            fontSize: sh * 0.02,
+                            fontFamily: 'Poppins-SemiBold',
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        SizedBox(height: sh * 0.008),
+
+                        // Subtitle - Darker
+                        Flexible(
+                          child: Text(
+                            'Upload up to ${limit} images (JPG, PNG, GIF - max 5MB each)',
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: sh * 0.014,
+                              fontFamily: 'Poppins-Regular',
+                              color: Colors.grey.shade600,
+                              height: 1.3,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: sh * 0.02),
+
+                        // Add Images Button with Gradient
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: sw * 0.05,
+                            vertical: sh * 0.01,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: AlignmentDirectional.bottomCenter,
+                              colors: [
+                                AppColors.appGradient1,
+                                AppColors.appGradient2,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(6),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.appGradient1.withOpacity(0.3),
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.add_photo_alternate_outlined,
+                                color: Colors.white,
+                                size: sh * 0.018,
+                              ),
+                              SizedBox(width: sw * 0.015),
+                              Text(
+                                'Add Images',
+                                style: TextStyle(
+                                  fontSize: sh * 0.016,
+                                  fontFamily: 'Poppins-Medium',
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   )
-                : ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.file(selectedImage, fit: BoxFit.cover),
+                : Stack(
+                    children: [
+                      // Selected Image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          selectedImage,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      ),
+
+                      // Edit/Change overlay
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                            size: sh * 0.018,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ),
@@ -500,12 +632,12 @@ class PostAddWidgets {
       height: sh * 0.07,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: AlignmentDirectional.bottomCenter,
-          colors: [
-          AppColors.appGradient1,
-          AppColors.appGradient2,
-        ]),
+            begin: Alignment.topCenter,
+            end: AlignmentDirectional.bottomCenter,
+            colors: [
+              AppColors.appGradient1,
+              AppColors.appGradient2,
+            ]),
         borderRadius: BorderRadius.circular(8),
       ),
       child: ElevatedButton(

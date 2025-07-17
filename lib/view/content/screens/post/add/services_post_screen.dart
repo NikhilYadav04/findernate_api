@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'dart:io';
 
 import 'package:social_media_clone/core/constants/appColors.dart';
-import 'package:social_media_clone/view/content/widgets/hashtag_card.dart';
-import 'package:social_media_clone/view/content/widgets/post-add_widgets.dart';
-import 'package:social_media_clone/view/content/widgets/reel_add_widgets.dart';
+import 'package:social_media_clone/core/utils/snackBar.dart';
+import 'package:social_media_clone/http/services/post_services.dart';
+import 'package:social_media_clone/view/content/widgets/add/hashtag_card.dart';
+import 'package:social_media_clone/view/content/widgets/add/post-add_widgets.dart';
+import 'package:social_media_clone/view/content/widgets/add/reel_add_widgets.dart';
 
 // SERVICE POST SCREEN
 class ServicePostScreen extends StatefulWidget {
@@ -30,6 +34,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
   // Basic post form controllers
   final TextEditingController locationController = TextEditingController();
   final TextEditingController captionController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   final TextEditingController mentionsController = TextEditingController();
   final TextEditingController settingsController = TextEditingController();
 
@@ -44,6 +49,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
   final TextEditingController countryController = TextEditingController();
   final TextEditingController durationController = TextEditingController();
   final TextEditingController requirementsController = TextEditingController();
+  final TextEditingController deliverablesController = TextEditingController();
 
   // Dropdown values
   String selectedCurrency = 'INR';
@@ -68,9 +74,237 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
   String selectedPostCategory = 'Personal Life';
   final TextEditingController hashtagController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
+  final PostService _postService = PostService();
+  bool _isLoading = false;
+
+  void _handleServicePost() async {
+    if (!_validateServiceForm()) {
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      File? mediaFile = widget.isReel ? selectedVideo : selectedImage;
+
+      if (mediaFile == null) {
+        showSnackBar(
+            'Please select ${widget.isReel ? 'a video' : 'an image'}', context,
+            isError: true);
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      List<Map<String, dynamic>> _buildScheduleArray() {
+        List<Map<String, dynamic>> schedule = [];
+
+        scheduleData.forEach((day, data) {
+          if (!data['isClosed'] &&
+              data['startTime'].isNotEmpty &&
+              data['endTime'].isNotEmpty) {
+            schedule.add({
+              "day": day,
+              "timeSlots": [
+                {"startTime": data['startTime'], "endTime": data['endTime']}
+              ]
+            });
+          }
+        });
+
+        return schedule;
+      }
+
+      Map<String, dynamic> serviceData = {
+        "name": serviceNameController.text.trim(),
+        "description": serviceDescriptionController.text.trim(),
+        "price": double.tryParse(priceController.text.trim()) ?? 0,
+        "currency": selectedCurrency,
+        "category": selectedCategory,
+        "subcategory": selectedSubCategory,
+        "duration": int.tryParse(durationController.text.trim()) ?? 0,
+        "serviceType": selectedServiceType,
+        "availability": {
+          "schedule": _buildScheduleArray(),
+          "timezone": "Asia/Kolkata",
+          "bookingAdvance": 1,
+          "maxBookingsPerDay": 5
+        },
+        "location": {
+          "type": "studio",
+          "address": addressController.text.trim(),
+          "city": placeController.text.trim(),
+          "state": stateController.text.trim(),
+          "country": countryController.text.trim(),
+          "coordinates": {
+            "type": "Point",
+            "coordinates": [77.2193791, 28.6314022]
+          }
+        },
+        "requirements": requirementsController.text.trim().isEmpty
+            ? []
+            : [requirementsController.text.trim()],
+        "deliverables": deliverablesController.text.trim().isEmpty
+            ? []
+            : [deliverablesController.text.trim()],
+        "tags": hashtags.isEmpty ? [] : hashtags,
+      };
+
+      Map<String, dynamic> settingsData = {
+        "visibility": "public",
+        "allowComments": true,
+        "allowLikes": true,
+      };
+
+      Map<String, String> locationData = {
+        "name": locationController.text.trim().isEmpty
+            ? "Unknown Location"
+            : locationController.text.trim()
+      };
+
+      List<String> mentions = [];
+
+      final response = await _postService.createServicePost(
+        media: mediaFile,
+        postType: widget.isReel ? "reel" : "photo",
+        caption: captionController.text.trim(),
+        description: descriptionController.text.trim(),
+        mentions: mentions,
+        settings: settingsData,
+        location: locationData,
+        status: "published",
+        service: serviceData,
+      );
+
+      Logger().d(settingsData);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (response.success) {
+        showSnackBar(
+            widget.isReel
+                ? 'Service Reel created successfully!'
+                : 'Service Post created successfully!',
+            context,
+            isError: false);
+        Logger().d(response.data);
+        _clearServiceForm();
+        Navigator.pop(context);
+      } else {
+        showSnackBar(response.message, context, isError: true);
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBar('An error occurred: ${e.toString()}', context,
+          isError: true);
+    }
+  }
+
+  bool _validateServiceForm() {
+    if (widget.isReel && selectedVideo == null) {
+      showSnackBar('Please select a video', context, isError: true);
+      return false;
+    }
+
+    if (!widget.isReel && selectedImage == null) {
+      showSnackBar('Please select an image', context, isError: true);
+      return false;
+    }
+
+    if (serviceNameController.text.trim().isEmpty) {
+      showSnackBar('Please enter service name', context, isError: true);
+      return false;
+    }
+
+    if (serviceDescriptionController.text.trim().isEmpty) {
+      showSnackBar('Please enter service description', context, isError: true);
+      return false;
+    }
+
+    if (priceController.text.trim().isEmpty) {
+      showSnackBar('Please enter service price', context, isError: true);
+      return false;
+    }
+
+    try {
+      double price = double.parse(priceController.text.trim());
+      if (price < 0) {
+        showSnackBar('Price cannot be negative', context, isError: true);
+        return false;
+      }
+    } catch (e) {
+      showSnackBar('Please enter a valid price', context, isError: true);
+      return false;
+    }
+
+    if (durationController.text.trim().isEmpty) {
+      showSnackBar('Please enter service duration', context, isError: true);
+      return false;
+    }
+
+    if (addressController.text.trim().isEmpty) {
+      showSnackBar('Please enter address', context, isError: true);
+      return false;
+    }
+
+    if (placeController.text.trim().isEmpty) {
+      showSnackBar('Please enter place/city', context, isError: true);
+      return false;
+    }
+
+    if (stateController.text.trim().isEmpty) {
+      showSnackBar('Please enter state', context, isError: true);
+      return false;
+    }
+
+    if (countryController.text.trim().isEmpty) {
+      showSnackBar('Please enter country', context, isError: true);
+      return false;
+    }
+
+    return true;
+  }
+
+  void _clearServiceForm() {
+    setState(() {
+      selectedImage = null;
+      selectedVideo = null;
+      captionController.clear();
+      locationController.clear();
+      serviceNameController.clear();
+      serviceDescriptionController.clear();
+      priceController.clear();
+      addressController.clear();
+      placeController.clear();
+      stateController.clear();
+      countryController.clear();
+      durationController.clear();
+      requirementsController.clear();
+      deliverablesController.clear();
+      hashtags.clear();
+      selectedCurrency = 'INR';
+      selectedCategory = 'Health & Wellness';
+      selectedSubCategory = 'Fitness';
+      selectedServiceType = 'in-person';
+      selectedAvailability = 'Available';
+      selectedPostCategory = 'Personal Life';
+      scheduleData = {
+        'Monday': {'isClosed': false, 'startTime': '', 'endTime': ''},
+        'Tuesday': {'isClosed': false, 'startTime': '', 'endTime': ''},
+        'Wednesday': {'isClosed': false, 'startTime': '', 'endTime': ''},
+        'Thursday': {'isClosed': false, 'startTime': '', 'endTime': ''},
+        'Friday': {'isClosed': false, 'startTime': '', 'endTime': ''},
+        'Saturday': {'isClosed': false, 'startTime': '', 'endTime': ''},
+        'Sunday': {'isClosed': true, 'startTime': '', 'endTime': ''},
+      };
+    });
   }
 
   @override
@@ -107,7 +341,11 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
           children: [
             // Select Image(s) Section
             widget.isReel
-                ? buildVideoPicker(sw, sh, selectedImage, _pickVideo)
+                ? VideoPickerWidget(
+                    sw: sw,
+                    sh: sh,
+                    selectedVideo: selectedImage,
+                    onTap: _pickVideo)
                 : PostAddWidgets.buildImagePicker(
                     sw, sh, selectedImage, _pickImage),
 
@@ -120,6 +358,11 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
 
             // Add Caption Section
             PostAddWidgets.buildCaptionField(captionController, sw, sh),
+
+            SizedBox(height: sh * 0.03),
+
+            // Add Caption Section
+            PostAddWidgets.buildDescriptionField(descriptionController, sw, sh),
 
             SizedBox(height: sh * 0.03),
 
@@ -150,7 +393,14 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
             SizedBox(height: sh * 0.05),
 
             // Upload Button
-            PostAddWidgets.buildCreateButton(sw, sh, () {}),
+            _isLoading
+                ? Center(
+                    child: SpinKitCircle(
+                      color: AppColors.appGradient1,
+                      size: 35,
+                    ),
+                  )
+                : PostAddWidgets.buildCreateButton(sw, sh, _handleServicePost),
 
             SizedBox(height: sh * 0.03),
           ],
@@ -179,13 +429,28 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Service Details',
-            style: TextStyle(
-              fontSize: sh * 0.022,
-              fontFamily: 'Poppins-Bold',
-              fontWeight: FontWeight.bold,
-              color: AppColors.black,
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: 'Service Details',
+                  style: TextStyle(
+                    fontSize: sh * 0.022,
+                    fontFamily: 'Poppins-Bold',
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.black,
+                  ),
+                ),
+                TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    fontSize: sh * 0.022,
+                    fontFamily: 'Poppins-Bold',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: sh * 0.02),
@@ -227,7 +492,19 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
           _buildServiceDropdown(
               'Category',
               selectedCategory,
-              ['Health & Wellness', 'Education', 'Technology', 'Business'],
+              [
+                'Health & Wellness',
+                'Education & Training',
+                'Technology & IT',
+                'Business & Finance',
+                'Creative Services',
+                'Home & Maintenance',
+                'Beauty & Personal Care',
+                'Transportation',
+                'Entertainment',
+                'Legal Services',
+                'Other'
+              ],
               sw,
               sh, (value) {
             setState(() {
@@ -316,7 +593,20 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
                 height: sh * 0.005,
               ),
               _buildServiceFieldWithLabel(
-                  'Requirements', requirementsController, 'Enter requirements for your services', sw, sh),
+                  'Requirements',
+                  requirementsController,
+                  'Enter requirements for your services',
+                  sw,
+                  sh),
+              SizedBox(
+                height: sh * 0.005,
+              ),
+              _buildServiceFieldWithLabel(
+                  'Deliverables',
+                  deliverablesController,
+                  'Enter deliverables for your services',
+                  sw,
+                  sh),
             ],
           ),
         ],
