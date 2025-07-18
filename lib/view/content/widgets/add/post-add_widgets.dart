@@ -375,6 +375,58 @@ class PostAddWidgets {
     );
   }
 
+  static Widget buildCardDropdown(String label, String value, List<String> items,
+      double sw, double sh, ValueChanged<String?> onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: sh * 0.065,
+          decoration: BoxDecoration(
+            color: AppColors.lightGrey,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade500, width: 1),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              icon: Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Icon(Icons.keyboard_arrow_down,
+                    color: AppColors.black, size: sh * 0.025),
+              ),
+              style: TextStyle(
+                color: AppColors.black,
+                fontSize: sh * 0.02,
+                fontFamily: 'Poppins-Light',
+              ),
+              hint: Text(
+                label,
+                style: TextStyle(
+                  color: Colors.grey.shade700,
+                  fontSize: sh * 0.02,
+                  fontFamily: 'Poppins-Medium',
+                ),
+              ),
+              items: items.map<DropdownMenuItem<String>>((String item) {
+                return DropdownMenuItem<String>(
+                  value: item,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
+                    child: Text(item),
+                  ),
+                );
+              }).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+        SizedBox(height: sh * 0.015),
+      ],
+    );
+  }
+
   // ===========================================
   // POST CATEGORY SECTION
   // ===========================================

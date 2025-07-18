@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
@@ -115,11 +117,14 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
         status: "published",
       );
 
+      Logger().d(hashtags);
+
       setState(() {
         _isLoading = false;
       });
 
       if (response.success) {
+        Logger().d(response.data);
         showSnackBar(
             widget.isReel
                 ? 'Product Reel created successfully!'
@@ -293,9 +298,9 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
                       size: 35,
                     ),
                   )
-                : PostAddWidgets.buildCreateButton(sw, sh, () {
-                    Logger().d(hashtags);
-                  }),
+                : PostAddWidgets.buildCreateButton(sw, sh, (){
+                  Logger().d(jsonEncode(hashtags));
+                }),
 
             SizedBox(height: sh * 0.03),
           ],
@@ -365,7 +370,7 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
               SizedBox(width: sw * 0.04),
               Expanded(
                 flex: 2,
-                child: _buildProductDropdown(
+                child: PostAddWidgets.buildCardDropdown(
                     'Currency', selectedCurrency, ['INR', 'USD', 'EUR'], sw, sh,
                     (value) {
                   setState(() {
@@ -500,59 +505,6 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
       children: [
         PostAddWidgets.buildTextField(controller, hint, sw, sh,
             maxLines: maxLines, label: label),
-        SizedBox(height: sh * 0.015),
-      ],
-    );
-  }
-
-  // Product Dropdown Builder
-  Widget _buildProductDropdown(String label, String value, List<String> items,
-      double sw, double sh, ValueChanged<String?> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: sh * 0.065,
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade500, width: 1),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              icon: Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: Icon(Icons.keyboard_arrow_down,
-                    color: AppColors.black, size: sh * 0.025),
-              ),
-              style: TextStyle(
-                color: AppColors.black,
-                fontSize: sh * 0.018,
-                fontFamily: 'Poppins-Light',
-              ),
-              hint: Text(
-                label,
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: sh * 0.018,
-                  fontFamily: 'Poppins-Medium',
-                ),
-              ),
-              items: items.map<DropdownMenuItem<String>>((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
-                    child: Text(item),
-                  ),
-                );
-              }).toList(),
-              onChanged: onChanged,
-            ),
-          ),
-        ),
         SizedBox(height: sh * 0.015),
       ],
     );

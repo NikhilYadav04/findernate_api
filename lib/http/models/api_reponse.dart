@@ -13,13 +13,28 @@ class ApiResponse<T> {
     this.errors,
   });
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(dynamic)? fromJsonT) {
+  factory ApiResponse.fromJson(
+      Map<String, dynamic> json, T Function(dynamic)? fromJsonT) {
     return ApiResponse<T>(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
-      data: fromJsonT != null && json['data'] != null ? fromJsonT(json['data']) : json['data'],
+      data: fromJsonT != null && json['data'] != null
+          ? fromJsonT(json['data'])
+          : json['data'],
       statusCode: json['statusCode'],
       errors: json['errors'],
+    );
+  }
+
+  //* Success response
+  factory ApiResponse.fromDirectJson(
+      dynamic json, T Function(dynamic)? fromJsonT) {
+    return ApiResponse<T>(
+      success: true,
+      message: 'Success',
+      data: fromJsonT != null && json != null ? fromJsonT(json) : json,
+      statusCode: 200,
+      errors: null,
     );
   }
 
@@ -34,7 +49,8 @@ class ApiResponse<T> {
   }
 
   //* Error response
-  factory ApiResponse.error(String message, {int? statusCode, Map<String, dynamic>? errors}) {
+  factory ApiResponse.error(String message,
+      {int? statusCode, Map<String, dynamic>? errors}) {
     return ApiResponse<T>(
       success: false,
       message: message,

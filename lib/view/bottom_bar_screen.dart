@@ -4,6 +4,7 @@ import 'package:social_media_clone/core/constants/appColors.dart';
 import 'package:social_media_clone/core/constants/appControllers.dart';
 import 'package:social_media_clone/core/router/appRouter.dart';
 import 'package:social_media_clone/view/bottom_bar_widgets.dart';
+import 'package:social_media_clone/view/home/screen/home_screen.dart';
 import 'package:social_media_clone/view/profile/screen/profile_screen.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,7 +22,6 @@ List<BottomCardModel> _bottomCards = [
     svgUrl: 'assets/images/svg/ic_live.svg', // dummy local SVG path
     label: 'Go Live',
   ),
- 
 ];
 
 class BottomBarScreen extends StatefulWidget {
@@ -74,7 +74,6 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           },
         );
       },
-      
     ];
   }
 
@@ -410,11 +409,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           child: IndexedStack(
             index: _currentIndex,
             children: [
-              Container(
-                child: Center(
-                  child: Text("Home Screen"),
-                ),
-              ),
+              HomeScreen(),
               Container(
                 child: Center(
                   child: Text("Search Screen"),

@@ -40,7 +40,7 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
   final TextEditingController locationController = TextEditingController();
 
   // Dropdown values for mood and activity
-  String selectedMood = 'Happy';
+  String selectedMood = 'Excited';
   String selectedActivity = 'Relaxing';
   bool _isLoading = false;
 

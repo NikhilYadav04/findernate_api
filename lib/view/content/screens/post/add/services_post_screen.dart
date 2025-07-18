@@ -477,7 +477,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
               SizedBox(width: sw * 0.04),
               Expanded(
                 flex: 2,
-                child: _buildServiceDropdown(
+                child: PostAddWidgets.buildCardDropdown(
                     'Currency', selectedCurrency, ['INR', 'USD', 'EUR'], sw, sh,
                     (value) {
                   setState(() {
@@ -489,7 +489,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
           ),
 
           // Category (Full width)
-          _buildServiceDropdown(
+          PostAddWidgets.buildCardDropdown(
               'Category',
               selectedCategory,
               [
@@ -513,7 +513,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
           }),
 
           // Sub Category (Full width)
-          _buildServiceDropdown(
+          PostAddWidgets.buildCardDropdown(
               'Sub Category',
               selectedSubCategory,
               ['Fitness', 'Nutrition', 'Mental Health', 'Yoga'],
@@ -533,7 +533,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
               ),
               SizedBox(width: sw * 0.04),
               Expanded(
-                child: _buildServiceDropdown(
+                child: PostAddWidgets.buildCardDropdown(
                     'Service Type',
                     selectedServiceType,
                     ['in-person', 'online', 'hybrid'],
@@ -548,7 +548,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
           ),
 
           // Availability
-          _buildServiceDropdown('Availability', selectedAvailability,
+          PostAddWidgets.buildCardDropdown('Availability', selectedAvailability,
               ['Available', 'Not Available', 'Limited'], sw, sh, (value) {
             setState(() {
               selectedAvailability = value!;
@@ -650,59 +650,6 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
       children: [
         PostAddWidgets.buildTextField(controller, hint, sw, sh,
             maxLines: maxLines, label: label),
-        SizedBox(height: sh * 0.015),
-      ],
-    );
-  }
-
-  // Service Dropdown Builder
-  Widget _buildServiceDropdown(String label, String value, List<String> items,
-      double sw, double sh, ValueChanged<String?> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: sh * 0.065,
-          decoration: BoxDecoration(
-            color: AppColors.lightGrey,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade500, width: 1),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: value,
-              isExpanded: true,
-              icon: Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: Icon(Icons.keyboard_arrow_down,
-                    color: AppColors.black, size: sh * 0.025),
-              ),
-              style: TextStyle(
-                color: AppColors.black,
-                fontSize: sh * 0.02,
-                fontFamily: 'Poppins-Light',
-              ),
-              hint: Text(
-                label,
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: sh * 0.02,
-                  fontFamily: 'Poppins-Medium',
-                ),
-              ),
-              items: items.map<DropdownMenuItem<String>>((String item) {
-                return DropdownMenuItem<String>(
-                  value: item,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
-                    child: Text(item),
-                  ),
-                );
-              }).toList(),
-              onChanged: onChanged,
-            ),
-          ),
-        ),
         SizedBox(height: sh * 0.015),
       ],
     );

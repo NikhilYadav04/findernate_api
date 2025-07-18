@@ -107,7 +107,7 @@ class _UniversalPostCardState extends State<UniversalPostCard>
           _buildHeader(sw, sh),
 
           //* Content Type Specific Info
-          buildContentTypeInfo(sw, sh, widget.postData),
+          buildContentTypeInfo(sw, sh,context, widget.postData),
 
           //* Post Image
           buildPostImage(sw, sh, _handleDoubleTap, widget.postData),

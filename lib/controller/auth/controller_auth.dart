@@ -591,6 +591,7 @@ class ProviderAuth extends ChangeNotifier {
 
       if (response.success) {
         _setCurrentUserData(null);
+        clearAll();
         _setLoading(false);
         showSnackBar(response.message, context, isError: false);
 

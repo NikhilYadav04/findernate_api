@@ -17,12 +17,14 @@ import 'package:social_media_clone/view/bottom_bar_screen.dart';
 import 'package:social_media_clone/view/content/screens/post/add/post_root_screen.dart';
 import 'package:social_media_clone/view/content/screens/post/display/normal_post_display.dart';
 import 'package:social_media_clone/view/content/screens/reel/reel_root_screen.dart';
+import 'package:social_media_clone/view/home/screen/story_view_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/onboard_root_screen.dart';
 import 'package:social_media_clone/view/onboarding/screens/splash_screen.dart';
 import 'package:social_media_clone/view/profile/screen/image_crop_screen.dart';
 import 'package:social_media_clone/view/profile/screen/profile_edit_screen.dart';
 import 'package:social_media_clone/view/settings/screen/account_settings_screen.dart';
 import 'package:social_media_clone/view/settings/screen/profile_settings_screen_2.dart';
+import 'package:vs_story_designer/vs_story_designer.dart';
 
 enum TransitionType {
   rightToLeft,
@@ -101,8 +103,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
   Widget page;
   switch (settings.name) {
     case '/':
-      //page = SplashScreen();
-      page = UniversalPostDemo();
+      page = SplashScreen();
+    //  page = UniversalPostDemo();
       break;
     case '/onboard':
       page = OnboardRootScreen();
@@ -176,6 +178,31 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       break;
     case '/reel-add-screen':
       page = CreateReelScreen();
+      break;
+    case '/add-story-screen':
+      final argsMap = args ?? <String, dynamic>{};
+      final centerText =
+          argsMap['title'] as String? ?? 'Start Creating Your Story';
+      final imagePath = argsMap['imagePath'] as String?;
+      Widget middleBottomWidget =
+          argsMap['middleBottomWidget'] as Widget? ?? SizedBox();
+      Widget onDoneButtonStyle =
+          argsMap['onDoneButtonStyle'] as Widget? ?? SizedBox();
+
+      page = VSStoryDesigner(
+        middleBottomWidget: Center(
+          child: middleBottomWidget,
+        ),
+        centerText: centerText,
+        themeType: ThemeType.dark,
+        galleryThumbnailQuality: 250,
+        mediaPath: imagePath,
+        onDone: (uri) {},
+        onDoneButtonStyle: onDoneButtonStyle,
+      );
+      break;
+    case '/story-view':
+      page = StoryView();
       break;
     default:
       page = Text("No Pages Available");

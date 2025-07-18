@@ -14,6 +14,17 @@ class UserService extends ApiService {
     return response;
   }
 
+  //* Get dummy data for testing
+  Future<ApiResponse<List<Map<String, dynamic>>>> getPosts(
+      {int page = 1, int limit = 10}) async {
+    final response = await get<List<Map<String, dynamic>>>(
+        'https://jsonplaceholder.typicode.com/posts?_page=$page&_limit=$limit',
+        fromJson: (data) => List<Map<String, dynamic>>.from(data),
+        isDirectJson: true);
+
+    return response;
+  }
+
   //* Upload Profile Photo
   Future<ApiResponse<Map<String, dynamic>>> uploadProfilePhoto({
     required String imagePath,
