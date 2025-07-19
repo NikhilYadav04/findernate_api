@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
+import 'package:social_media_clone/http/models/posts/base_post_model.dart';
 
-Widget buildTags(double sw, double sh,Map<String, dynamic> postData) {
+Widget buildTags(double sw, double sh, PostModel postData) {
   final tags = _getAllTags(postData);
 
   if (tags.isEmpty) return SizedBox.shrink();
@@ -28,21 +29,17 @@ Widget buildTags(double sw, double sh,Map<String, dynamic> postData) {
   );
 }
 
-List<String> _getAllTags(Map<String, dynamic> postData) {
-  final contentType = postData['data']['contentType'];
+List<String> _getAllTags(PostModel postData) {
+  final contentType = postData.contentType;
   switch (contentType) {
     case 'business':
-      return List<String>.from(
-          postData['data']['customization']['business']['tags'] ?? []);
+      return List<String>.from(postData.customization.business?.tags ?? []);
     case 'service':
-      return List<String>.from(
-          postData['data']['customization']['service']['tags'] ?? []);
+      return List<String>.from(postData.customization.service?.tags ?? []);
     case 'product':
-      return List<String>.from(
-          postData['data']['customization']['product']['tags'] ?? []);
+      return List<String>.from(postData.customization.product?.tags ?? []);
     case 'normal':
-      return List<String>.from(
-          postData['data']['customization']['normal']['tags'] ?? []);
+      return List<String>.from(postData.customization.normal?.tags ?? []);
     default:
       return [];
   }

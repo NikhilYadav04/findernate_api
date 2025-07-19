@@ -8,10 +8,8 @@ import 'package:social_media_clone/http/utils/api_endpoints.dart';
 
 class PostService extends ApiService {
   //* Create Normal Post
-
-  //* Create Normal Post
   Future<ApiResponse<Map<String, dynamic>>> createNormalPost({
-    required File media,
+    required dynamic media,
     required String postType,
     required String caption,
     required String description,
@@ -23,11 +21,26 @@ class PostService extends ApiService {
     required Map<String, dynamic> settings,
     required String status,
   }) async {
-    final formData = FormData.fromMap({
-      'media': await MultipartFile.fromFile(
+    Map<String, dynamic> formDataMap = {};
+
+    if (media is List<File>) {
+      for (int i = 0; i < media.length; i++) {
+        String fieldName = postType == 'photo' ? 'image[$i]' : 'video[$i]';
+        formDataMap[fieldName] = await MultipartFile.fromFile(
+          media[i].path,
+          filename: media[i].path.split('/').last,
+        );
+      }
+    } else if (media is File) {
+      String fieldName = postType == 'photo' ? 'image' : 'video';
+      formDataMap[fieldName] = await MultipartFile.fromFile(
         media.path,
         filename: media.path.split('/').last,
-      ),
+      );
+    }
+
+    //* Add other form fields
+    formDataMap.addAll({
       'postType': postType,
       'caption': caption,
       'description': description,
@@ -40,6 +53,8 @@ class PostService extends ApiService {
       'status': status,
     });
 
+    final formData = FormData.fromMap(formDataMap);
+
     final response = await post<Map<String, dynamic>>(
       ApiEndpoints.createPost,
       data: formData,
@@ -51,7 +66,7 @@ class PostService extends ApiService {
 
   //* Create Business Post
   Future<ApiResponse<Map<String, dynamic>>> createBusinessPost({
-    required File media,
+    required dynamic media,
     required String postType,
     required String caption,
     required String description,
@@ -60,11 +75,25 @@ class PostService extends ApiService {
     required Map<String, dynamic> settings,
     required String status,
   }) async {
-    final formData = FormData.fromMap({
-      'media': await MultipartFile.fromFile(
+    Map<String, dynamic> formDataMap = {};
+
+    if (media is List<File>) {
+      for (int i = 0; i < media.length; i++) {
+        String fieldName = postType == 'photo' ? 'image[$i]' : 'video[$i]';
+        formDataMap[fieldName] = await MultipartFile.fromFile(
+          media[i].path,
+          filename: media[i].path.split('/').last,
+        );
+      }
+    } else if (media is File) {
+      String fieldName = postType == 'photo' ? 'image' : 'video';
+      formDataMap[fieldName] = await MultipartFile.fromFile(
         media.path,
         filename: media.path.split('/').last,
-      ),
+      );
+    }
+
+    formDataMap.addAll({
       'postType': postType,
       'caption': caption,
       'description': description,
@@ -73,6 +102,8 @@ class PostService extends ApiService {
       'settings': jsonEncode(settings),
       'status': status,
     });
+
+    final formData = FormData.fromMap(formDataMap);
 
     final response = await post<Map<String, dynamic>>(
       ApiEndpoints.createBusinessPost,
@@ -85,7 +116,7 @@ class PostService extends ApiService {
 
   //* Create Service Post
   Future<ApiResponse<Map<String, dynamic>>> createServicePost({
-    required File media,
+    required dynamic media,
     required String postType,
     required String caption,
     required String description,
@@ -95,11 +126,25 @@ class PostService extends ApiService {
     required String status,
     required Map<String, dynamic> service,
   }) async {
-    final formData = FormData.fromMap({
-      'media': await MultipartFile.fromFile(
+    Map<String, dynamic> formDataMap = {};
+
+    if (media is List<File>) {
+      for (int i = 0; i < media.length; i++) {
+        String fieldName = postType == 'photo' ? 'image[$i]' : 'video[$i]';
+        formDataMap[fieldName] = await MultipartFile.fromFile(
+          media[i].path,
+          filename: media[i].path.split('/').last,
+        );
+      }
+    } else if (media is File) {
+      String fieldName = postType == 'photo' ? 'image' : 'video';
+      formDataMap[fieldName] = await MultipartFile.fromFile(
         media.path,
         filename: media.path.split('/').last,
-      ),
+      );
+    }
+
+    formDataMap.addAll({
       'postType': postType,
       'caption': caption,
       'description': description,
@@ -109,6 +154,8 @@ class PostService extends ApiService {
       'status': status,
       'service': jsonEncode(service),
     });
+
+    final formData = FormData.fromMap(formDataMap);
 
     final response = await post<Map<String, dynamic>>(
       ApiEndpoints.createServicePost,
@@ -121,7 +168,7 @@ class PostService extends ApiService {
 
   //* Create Product Post
   Future<ApiResponse<Map<String, dynamic>>> createProductPost({
-    required File media,
+    required dynamic media,
     required String postType,
     required String caption,
     required String description,
@@ -134,11 +181,25 @@ class PostService extends ApiService {
     required Map<String, dynamic> product,
     required String status,
   }) async {
-    final formData = FormData.fromMap({
-      'media': await MultipartFile.fromFile(
+    Map<String, dynamic> formDataMap = {};
+
+    if (media is List<File>) {
+      for (int i = 0; i < media.length; i++) {
+        String fieldName = postType == 'photo' ? 'image[$i]' : 'video[$i]';
+        formDataMap[fieldName] = await MultipartFile.fromFile(
+          media[i].path,
+          filename: media[i].path.split('/').last,
+        );
+      }
+    } else if (media is File) {
+      String fieldName = postType == 'photo' ? 'image' : 'video';
+      formDataMap[fieldName] = await MultipartFile.fromFile(
         media.path,
         filename: media.path.split('/').last,
-      ),
+      );
+    }
+
+    formDataMap.addAll({
       'postType': postType,
       'caption': caption,
       'description': description,
@@ -152,6 +213,8 @@ class PostService extends ApiService {
       'status': status,
     });
 
+    final formData = FormData.fromMap(formDataMap);
+
     final response = await post<Map<String, dynamic>>(
       ApiEndpoints.createProductPost,
       data: formData,
@@ -161,10 +224,27 @@ class PostService extends ApiService {
     return response;
   }
 
-  //* Get all home post feed
-  Future<ApiResponse<Map<String, dynamic>>> getHomeFeed() async {
+  //* Get home post feed with pagination
+  Future<ApiResponse<Map<String, dynamic>>> getHomeFeed({
+    int page = 1,
+    int limit = 10,
+  }) async {
     final response = await get<Map<String, dynamic>>(
-      ApiEndpoints.getUserStats,
+      '${ApiEndpoints.HomeFeedPosts}?page=$page&limit=$limit',
+      fromJson: (data) => data as Map<String, dynamic>,
+    );
+
+    return response;
+  }
+
+  //* Get Current User Posts with pagination
+  Future<ApiResponse<Map<String, dynamic>>> getCurrentUserPosts({
+    String postType = "photo",
+    int page = 1,
+    int limit = 10,
+  }) async {
+    final response = await get<Map<String, dynamic>>(
+      '${ApiEndpoints.CurrentUserPosts}??postType=$postType&page=$page&limit=$limit',
       fromJson: (data) => data as Map<String, dynamic>,
     );
 

@@ -50,6 +50,10 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
   final TextEditingController durationController = TextEditingController();
   final TextEditingController requirementsController = TextEditingController();
   final TextEditingController deliverablesController = TextEditingController();
+  final TextEditingController linkController = TextEditingController();
+  final TextEditingController maxBookingsController = TextEditingController();
+  final TextEditingController advanceBookingController =
+      TextEditingController();
 
   // Dropdown values
   String selectedCurrency = 'INR';
@@ -130,8 +134,8 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
         "availability": {
           "schedule": _buildScheduleArray(),
           "timezone": "Asia/Kolkata",
-          "bookingAdvance": 1,
-          "maxBookingsPerDay": 5
+          "bookingAdvance": int.parse(advanceBookingController.text.trim()),
+          "maxBookingsPerDay": int.parse(maxBookingsController.text.trim())
         },
         "location": {
           "type": "studio",
@@ -151,6 +155,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
             ? []
             : [deliverablesController.text.trim()],
         "tags": hashtags.isEmpty ? [] : hashtags,
+        "link": linkController.text.trim()
       };
 
       Map<String, dynamic> settingsData = {
@@ -179,7 +184,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
         service: serviceData,
       );
 
-      Logger().d(settingsData);
+      Logger().d(serviceData);
 
       setState(() {
         _isLoading = false;
@@ -344,7 +349,7 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
                 ? VideoPickerWidget(
                     sw: sw,
                     sh: sh,
-                    selectedVideo: selectedImage,
+                    selectedVideo: selectedVideo,
                     onTap: _pickVideo)
                 : PostAddWidgets.buildImagePicker(
                     sw, sh, selectedImage, _pickImage),
@@ -547,6 +552,17 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
             ],
           ),
 
+          // Max Booking And Advance Booking
+          _buildServiceFieldWithLabel('Maximum Bookings Per Day',
+              maxBookingsController, 'Enter max bookings (e.g. 5)', sw, sh),
+
+          _buildServiceFieldWithLabel(
+              'Advance Booking Days',
+              advanceBookingController,
+              'Enter days in advance (e.g. 3)',
+              sw,
+              sh),
+
           // Availability
           PostAddWidgets.buildCardDropdown('Availability', selectedAvailability,
               ['Available', 'Not Available', 'Limited'], sw, sh, (value) {
@@ -607,6 +623,11 @@ class _ServicePostScreenState extends State<ServicePostScreen> {
                   'Enter deliverables for your services',
                   sw,
                   sh),
+              SizedBox(
+                height: sh * 0.005,
+              ),
+              _buildServiceFieldWithLabel('Service Link', linkController,
+                  'Provide link to book your service', sw, sh),
             ],
           ),
         ],

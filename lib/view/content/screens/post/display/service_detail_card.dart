@@ -1,8 +1,11 @@
 // service_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:social_media_clone/core/constants/appColors.dart';
+import 'package:social_media_clone/core/utils/linkhelper.dart';
+import 'package:social_media_clone/http/models/posts/model_service.dart';
 
 class ServiceDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> serviceData;
+  final ServiceCustomizationModel serviceData;
 
   const ServiceDetailScreen({
     Key? key,
@@ -13,7 +16,6 @@ class ServiceDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
     final sh = MediaQuery.of(context).size.height;
-    final service = serviceData['customization']['service'];
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -40,8 +42,8 @@ class ServiceDetailScreen extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.blue.shade400,
-                        Colors.indigo.shade600,
+                        AppColors.appGradient1,
+                        AppColors.appGradient2,
                       ],
                     ),
                   ),
@@ -57,32 +59,32 @@ class ServiceDetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Service Info Card
-                  _buildServiceInfoCard(sw, sh, service),
+                  _buildServiceInfoCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Price & Duration Row
-                  _buildPriceAndDurationRow(sw, sh, service),
+                  _buildPriceAndDurationRow(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Category Card
-                  _buildCategoryCard(sw, sh, service),
+                  _buildCategoryCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Location Card
-                  _buildLocationCard(sw, sh, service),
+                  _buildLocationCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Timing Card
-                  _buildTimingCard(sw, sh, service),
+                  _buildTimingCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Requirements & Deliverables Row
-                  _buildRequirementsAndDeliverablesRow(sw, sh, service),
+                  _buildRequirementsAndDeliverablesRow(sw, sh),
 
                   SizedBox(height: sh * 0.04),
                 ],
@@ -112,8 +114,7 @@ class ServiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceInfoCard(
-      double sw, double sh, Map<String, dynamic> service) {
+  Widget _buildServiceInfoCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -137,7 +138,10 @@ class ServiceDetailScreen extends StatelessWidget {
                 padding: EdgeInsets.all(sw * 0.02),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.blue.shade500, Colors.indigo.shade500],
+                    colors: [
+                      AppColors.appGradient1,
+                      AppColors.appGradient2,
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -146,7 +150,7 @@ class ServiceDetailScreen extends StatelessWidget {
               SizedBox(width: sw * 0.03),
               Expanded(
                 child: Text(
-                  service['name'] ?? '',
+                  serviceData.name,
                   style: TextStyle(
                     fontSize: sh * 0.024,
                     fontFamily: 'Poppins-Bold',
@@ -167,7 +171,7 @@ class ServiceDetailScreen extends StatelessWidget {
               border: Border.all(color: Colors.blue.shade200),
             ),
             child: Text(
-              service['description'] ?? '',
+              serviceData.description,
               style: TextStyle(
                 fontSize: sh * 0.016,
                 fontFamily: 'Poppins-Regular',
@@ -181,8 +185,7 @@ class ServiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPriceAndDurationRow(
-      double sw, double sh, Map<String, dynamic> service) {
+  Widget _buildPriceAndDurationRow(double sw, double sh) {
     return Row(
       children: [
         Expanded(
@@ -216,7 +219,7 @@ class ServiceDetailScreen extends StatelessWidget {
                 ),
                 SizedBox(height: sh * 0.008),
                 Text(
-                  '${service['currency']} ${service['price']}',
+                  '${serviceData.currency} ${serviceData.price}',
                   style: TextStyle(
                     fontSize: sh * 0.022,
                     fontFamily: 'Poppins-Bold',
@@ -260,7 +263,7 @@ class ServiceDetailScreen extends StatelessWidget {
                 ),
                 SizedBox(height: sh * 0.008),
                 Text(
-                  '${service['duration']} min',
+                  '${serviceData.duration} min',
                   style: TextStyle(
                     fontSize: sh * 0.022,
                     fontFamily: 'Poppins-Bold',
@@ -276,8 +279,7 @@ class ServiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(
-      double sw, double sh, Map<String, dynamic> service) {
+  Widget _buildCategoryCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -334,7 +336,7 @@ class ServiceDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        service['category'] ?? '',
+                        serviceData.category,
                         style: TextStyle(
                           fontSize: sh * 0.016,
                           fontFamily: 'Poppins-SemiBold',
@@ -366,7 +368,7 @@ class ServiceDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        service['subcategory'] ?? '',
+                        serviceData.subcategory ?? 'N/A',
                         style: TextStyle(
                           fontSize: sh * 0.016,
                           fontFamily: 'Poppins-SemiBold',
@@ -385,12 +387,12 @@ class ServiceDetailScreen extends StatelessWidget {
                 horizontal: sw * 0.03, vertical: sh * 0.01),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.shade600, Colors.indigo.shade600],
+                colors: [AppColors.appGradient1, AppColors.appGradient2],
               ),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              service['serviceType']?.toUpperCase() ?? '',
+              serviceData.serviceType.toUpperCase(),
               style: TextStyle(
                 fontSize: sh * 0.012,
                 fontFamily: 'Poppins-Bold',
@@ -404,10 +406,7 @@ class ServiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationCard(
-      double sw, double sh, Map<String, dynamic> service) {
-    final location = service['location'];
-
+  Widget _buildLocationCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -467,7 +466,7 @@ class ServiceDetailScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      location['type']?.toUpperCase() ?? '',
+                      serviceData.location.type.toUpperCase(),
                       style: TextStyle(
                         fontSize: sh * 0.014,
                         fontFamily: 'Poppins-Bold',
@@ -496,7 +495,7 @@ class ServiceDetailScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '${location['address']}\n${location['city']}, ${location['state']}\n${location['country']}',
+                            '${serviceData.location.address}\n${serviceData.location.city}, ${serviceData.location.state}\n${serviceData.location.country}',
                             style: TextStyle(
                               fontSize: sh * 0.014,
                               fontFamily: 'Poppins-Regular',
@@ -517,10 +516,7 @@ class ServiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTimingCard(double sw, double sh, Map<String, dynamic> service) {
-    final availability = service['availability'];
-    final schedule = availability['schedule'] as List<dynamic>? ?? [];
-
+  Widget _buildTimingCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -555,12 +551,8 @@ class ServiceDetailScreen extends StatelessWidget {
             ],
           ),
           SizedBox(height: sh * 0.015),
-          if (schedule.isNotEmpty) ...[
-            ...schedule.map((daySchedule) {
-              final day = daySchedule['day'] ?? '';
-              final timeSlots =
-                  daySchedule['timeSlots'] as List<dynamic>? ?? [];
-
+          if (serviceData.availability.schedule.isNotEmpty) ...[
+            ...serviceData.availability.schedule.map((daySchedule) {
               return Container(
                 margin: EdgeInsets.only(bottom: sh * 0.01),
                 padding: EdgeInsets.all(sw * 0.03),
@@ -583,7 +575,7 @@ class ServiceDetailScreen extends StatelessWidget {
                     ),
                     SizedBox(width: sw * 0.03),
                     Text(
-                      day,
+                      daySchedule.day,
                       style: TextStyle(
                         fontSize: sh * 0.016,
                         fontFamily: 'Poppins-SemiBold',
@@ -591,7 +583,7 @@ class ServiceDetailScreen extends StatelessWidget {
                       ),
                     ),
                     Spacer(),
-                    if (timeSlots.isNotEmpty)
+                    if (daySchedule.timeSlots.isNotEmpty)
                       Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: sw * 0.02, vertical: sh * 0.005),
@@ -600,7 +592,7 @@ class ServiceDetailScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '${timeSlots[0]['startTime']} - ${timeSlots[0]['endTime']}',
+                          '${daySchedule.timeSlots.first.startTime} - ${daySchedule.timeSlots.first.endTime}',
                           style: TextStyle(
                             fontSize: sh * 0.013,
                             fontFamily: 'Poppins-Medium',
@@ -629,7 +621,7 @@ class ServiceDetailScreen extends StatelessWidget {
                 SizedBox(width: sw * 0.02),
                 Expanded(
                   child: Text(
-                    'Book ${availability['bookingAdvance']} hour(s) in advance • Maximum ${availability['maxBookingsPerDay']} bookings per day',
+                    'Book ${serviceData.availability.bookingAdvance} hour(s) in advance • Maximum ${serviceData.availability.maxBookingsPerDay} bookings per day',
                     style: TextStyle(
                       fontSize: sh * 0.013,
                       fontFamily: 'Poppins-Medium',
@@ -646,15 +638,11 @@ class ServiceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRequirementsAndDeliverablesRow(
-      double sw, double sh, Map<String, dynamic> service) {
-    final requirements = service['requirements'] as List<dynamic>? ?? [];
-    final deliverables = service['deliverables'] as List<dynamic>? ?? [];
-
+  Widget _buildRequirementsAndDeliverablesRow(double sw, double sh) {
     return Column(
       children: [
         // Requirements
-        if (requirements.isNotEmpty) ...[
+        if (serviceData.requirements.isNotEmpty) ...[
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(sw * 0.04),
@@ -689,7 +677,7 @@ class ServiceDetailScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: sh * 0.015),
-                ...requirements
+                ...serviceData.requirements
                     .map((requirement) => Container(
                           margin: EdgeInsets.only(bottom: sh * 0.01),
                           padding: EdgeInsets.all(sw * 0.03),
@@ -711,7 +699,7 @@ class ServiceDetailScreen extends StatelessWidget {
                               SizedBox(width: sw * 0.03),
                               Expanded(
                                 child: Text(
-                                  requirement.toString(),
+                                  requirement,
                                   style: TextStyle(
                                     fontSize: sh * 0.015,
                                     fontFamily: 'Poppins-Medium',
@@ -731,7 +719,7 @@ class ServiceDetailScreen extends StatelessWidget {
         ],
 
         // Deliverables
-        if (deliverables.isNotEmpty) ...[
+        if (serviceData.deliverables.isNotEmpty) ...[
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(sw * 0.04),
@@ -766,7 +754,7 @@ class ServiceDetailScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: sh * 0.015),
-                ...deliverables
+                ...serviceData.deliverables
                     .map((deliverable) => Container(
                           margin: EdgeInsets.only(bottom: sh * 0.01),
                           padding: EdgeInsets.all(sw * 0.03),
@@ -788,7 +776,7 @@ class ServiceDetailScreen extends StatelessWidget {
                               SizedBox(width: sw * 0.03),
                               Expanded(
                                 child: Text(
-                                  deliverable.toString(),
+                                  deliverable,
                                   style: TextStyle(
                                     fontSize: sh * 0.015,
                                     fontFamily: 'Poppins-Medium',
@@ -822,6 +810,7 @@ class ServiceDetailScreen extends StatelessWidget {
               backgroundColor: Colors.green,
             ),
           );
+          UrlLauncherHelper.launchURL(serviceData.link!);
         },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
@@ -834,8 +823,8 @@ class ServiceDetailScreen extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.blue.shade600,
-                Colors.indigo.shade600,
+                AppColors.appGradient1,
+                AppColors.appGradient2,
               ],
             ),
             borderRadius: BorderRadius.circular(12),

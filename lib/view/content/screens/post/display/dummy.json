@@ -1,0 +1,81 @@
+{
+  "businessName": "Urban Cafe",
+  "businessType": "Cafe",
+  "description": "Trendy new cafe with artisan coffee and snacks.",
+  "category": "Food & Beverage",
+  "subcategory": "Cafe",
+  "contact": {
+    "phone": "+91-9876543210",
+    "email": "info@urbancafe.com",
+    "website": "https://urbancafe.com",
+    "socialMedia": [
+      { "platform": "Findernate", "url": "https://findernate.com/urbancafe" }
+    ]
+  },
+  "location": {
+    "address": "A-12, Connaught Place",
+    "city": "Delhi",
+    "state": "Delhi",
+    "country": "India",
+    "postalCode": "110001"
+  },
+  "hours": [
+    {
+      "day": "Monday",
+      "openTime": "08:00",
+      "closeTime": "22:00",
+      "isClosed": false
+    },
+    {
+      "day": "Tuesday",
+      "openTime": "08:00",
+      "closeTime": "22:00",
+      "isClosed": false
+    },
+    {
+      "day": "Wednesday",
+      "openTime": "08:00",
+      "closeTime": "22:00",
+      "isClosed": false
+    },
+    {
+      "day": "Thursday",
+      "openTime": "08:00",
+      "closeTime": "22:00",
+      "isClosed": false
+    },
+    {
+      "day": "Friday",
+      "openTime": "08:00",
+      "closeTime": "23:00",
+      "isClosed": false
+    },
+    {
+      "day": "Saturday",
+      "openTime": "09:00",
+      "closeTime": "23:00",
+      "isClosed": false
+    },
+    {
+      "day": "Sunday",
+      "openTime": "09:00",
+      "closeTime": "21:00",
+      "isClosed": false
+    }
+  ],
+  "features": ["Free WiFi", "Outdoor Seating", "Live Music"],
+  "priceRange": "₹₹",
+  "rating": 4.8,
+  "tags": ["cafe", "coffee", "delhi", "grandopening"],
+  "announcement": "Grand opening this weekend! Free coffee for the first 50 guests.",
+  "promotions": [
+    {
+      "title": "Opening Offer",
+      "description": "Buy 1 Get 1 Free on all coffees.",
+      "discount": 50,
+      "validUntil": "2025-08-01T23:59:59.000Z",
+      "isActive": true
+    }
+  ],
+  "link": "https://www.amazon.in/?&tag=googhydrabk1-21&ref=pd_sl_5szpgfto9i_e&adgrpid=155259813593&hvpone=&hvptwo=&hvadid=674893540034&hvpos=&hvnetw=g&hvrand=10878944920005762071&hvqmt=e&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9062072&hvtargid=kwd-64107830&hydadcr=14452_2316413&gad_source=1"
+}

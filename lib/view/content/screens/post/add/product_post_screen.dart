@@ -41,6 +41,7 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
   // Product specific form controllers
   final TextEditingController productNameController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
+  final TextEditingController productLinkController = TextEditingController();
 
   // Dropdown values
   String selectedCurrency = 'INR';
@@ -86,6 +87,7 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
         "price": priceController.text.trim(),
         "currency": selectedCurrency,
         "inStock": isInStock,
+        "link": productLinkController.text.toString()
       };
 
       Map<String, dynamic> settingsData = {
@@ -117,7 +119,7 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
         status: "published",
       );
 
-      Logger().d(hashtags);
+      Logger().d(productData);
 
       setState(() {
         _isLoading = false;
@@ -235,7 +237,7 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
                 ? VideoPickerWidget(
                     sw: sw,
                     sh: sh,
-                    selectedVideo: selectedImage,
+                    selectedVideo: selectedVideo,
                     onTap: _pickVideo)
                 : PostAddWidgets.buildImagePicker(
                     sw, sh, selectedImage, _pickImage),
@@ -298,9 +300,7 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
                       size: 35,
                     ),
                   )
-                : PostAddWidgets.buildCreateButton(sw, sh, (){
-                  Logger().d(jsonEncode(hashtags));
-                }),
+                : PostAddWidgets.buildCreateButton(sw, sh,_handleProductPost),
 
             SizedBox(height: sh * 0.03),
           ],
@@ -358,6 +358,10 @@ class _ProductPostScreenState extends State<ProductPostScreen> {
           // Product Name
           _buildProductField('Product Name', productNameController,
               'Enter product name', sw, sh),
+
+          // Product Link
+          _buildProductField('Product Link', productLinkController,
+              'Enter product link', sw, sh),
 
           // Price and Currency Row
           Row(

@@ -1,9 +1,11 @@
 // business_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:social_media_clone/core/constants/appColors.dart';
 import 'package:social_media_clone/core/utils/linkhelper.dart';
+import 'package:social_media_clone/http/models/posts/model_business.dart';
 
 class BusinessDetailScreen extends StatelessWidget {
-  final Map<String, dynamic> businessData;
+  final BusinessCustomizationModel businessData;
 
   const BusinessDetailScreen({
     Key? key,
@@ -14,7 +16,6 @@ class BusinessDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final sw = MediaQuery.of(context).size.width;
     final sh = MediaQuery.of(context).size.height;
-    final business = businessData['customization']['business'];
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -41,8 +42,8 @@ class BusinessDetailScreen extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Color(0xFF8A2BE2),
-                        Color(0xFF4B0082),
+                        AppColors.appGradient1,
+                        AppColors.appGradient2,
                       ],
                     ),
                   ),
@@ -58,46 +59,45 @@ class BusinessDetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Announcement Section (if available)
-                  if (business['announcement'] != null &&
-                      business['announcement'].isNotEmpty) ...[
-                    _buildAnnouncementCard(sw, sh, business),
+                  if (businessData.announcement != null &&
+                      businessData.announcement!.isNotEmpty) ...[
+                    _buildAnnouncementCard(sw, sh),
                     SizedBox(height: sh * 0.02),
                   ],
 
                   // Promotions Section (if available)
-                  if (business['promotions'] != null &&
-                      business['promotions'].isNotEmpty) ...[
-                    _buildPromotionCard(sw, sh, business),
+                  if (businessData.promotions.isNotEmpty) ...[
+                    _buildPromotionCard(sw, sh),
                     SizedBox(height: sh * 0.02),
                   ],
 
                   // Business Info Card
-                  _buildBusinessInfoCard(sw, sh, business),
+                  _buildBusinessInfoCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Contact & Social Media Row
-                  _buildContactRow(sw, sh, business),
+                  _buildContactRow(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Category & Type Card
-                  _buildCategoryCard(sw, sh, business),
+                  _buildCategoryCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Location Card
-                  _buildLocationCard(sw, sh, business),
+                  _buildLocationCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Hours Card
-                  _buildHoursCard(sw, sh, business),
+                  _buildHoursCard(sw, sh),
 
                   SizedBox(height: sh * 0.02),
 
                   // Features & Rating Row
-                  _buildFeaturesAndRatingRow(sw, sh, business),
+                  _buildFeaturesAndRatingRow(sw, sh),
 
                   SizedBox(height: sh * 0.04),
                 ],
@@ -109,8 +109,7 @@ class BusinessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAnnouncementCard(
-      double sw, double sh, Map<String, dynamic> business) {
+  Widget _buildAnnouncementCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.03),
@@ -152,7 +151,7 @@ class BusinessDetailScreen extends StatelessWidget {
           ),
           SizedBox(height: sh * 0.005),
           Text(
-            business['announcement'],
+            businessData.announcement!,
             style: TextStyle(
               fontSize: sh * 0.014,
               fontFamily: 'Poppins-Medium',
@@ -165,9 +164,8 @@ class BusinessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPromotionCard(
-      double sw, double sh, Map<String, dynamic> business) {
-    final promotion = business['promotions'][0];
+  Widget _buildPromotionCard(double sw, double sh) {
+    final promotion = businessData.promotions.first;
 
     return Container(
       width: double.infinity,
@@ -215,7 +213,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '${promotion['discount']}% OFF',
+                  '${promotion.discount}% OFF',
                   style: TextStyle(
                     fontSize: sh * 0.011,
                     fontFamily: 'Poppins-Bold',
@@ -227,7 +225,7 @@ class BusinessDetailScreen extends StatelessWidget {
           ),
           SizedBox(height: sh * 0.005),
           Text(
-            promotion['title'] ?? '',
+            promotion.title,
             style: TextStyle(
               fontSize: sh * 0.015,
               fontFamily: 'Poppins-SemiBold',
@@ -235,24 +233,21 @@ class BusinessDetailScreen extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
-          if (promotion['description'] != null) ...[
-            SizedBox(height: sh * 0.003),
-            Text(
-              promotion['description'],
-              style: TextStyle(
-                fontSize: sh * 0.013,
-                fontFamily: 'Poppins-Medium',
-                color: Colors.red.shade800,
-              ),
+          SizedBox(height: sh * 0.003),
+          Text(
+            promotion.description,
+            style: TextStyle(
+              fontSize: sh * 0.013,
+              fontFamily: 'Poppins-Medium',
+              color: Colors.red.shade800,
             ),
-          ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildBusinessInfoCard(
-      double sw, double sh, Map<String, dynamic> business) {
+  Widget _buildBusinessInfoCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -276,7 +271,10 @@ class BusinessDetailScreen extends StatelessWidget {
                 padding: EdgeInsets.all(sw * 0.02),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Color(0xFF8A2BE2), Color(0xFF4B0082)],
+                    colors: [
+                      AppColors.appGradient1,
+                      AppColors.appGradient2,
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -289,7 +287,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      business['businessName'] ?? '',
+                      businessData.businessName,
                       style: TextStyle(
                         fontSize: sh * 0.024,
                         fontFamily: 'Poppins-Bold',
@@ -298,7 +296,7 @@ class BusinessDetailScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      business['businessType'] ?? '',
+                      businessData.businessType,
                       style: TextStyle(
                         fontSize: sh * 0.016,
                         fontFamily: 'Poppins-SemiBold',
@@ -309,7 +307,7 @@ class BusinessDetailScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                business['priceRange'] ?? '',
+                businessData.priceRange ?? "Rs..",
                 style: TextStyle(
                   fontSize: sh * 0.018,
                   fontFamily: 'Poppins-Bold',
@@ -333,7 +331,7 @@ class BusinessDetailScreen extends StatelessWidget {
               border: Border.all(color: Color(0xFF8A2BE2).withOpacity(0.3)),
             ),
             child: Text(
-              business['description'] ?? '',
+              businessData.description,
               style: TextStyle(
                 fontSize: sh * 0.016,
                 fontFamily: 'Poppins-Regular',
@@ -347,16 +345,15 @@ class BusinessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactRow(double sw, double sh, Map<String, dynamic> business) {
-    final contact = business['contact'];
-
+  Widget _buildContactRow(double sw, double sh) {
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: GestureDetector(
-                onTap: () => UrlLauncherHelper.launchPhone(contact['phone']),
+                onTap: () =>
+                    UrlLauncherHelper.launchPhone(businessData.contact.phone),
                 child: Container(
                   padding: EdgeInsets.all(sw * 0.04),
                   decoration: BoxDecoration(
@@ -390,7 +387,7 @@ class BusinessDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: sh * 0.008),
                       Text(
-                        contact['phone'] ?? '',
+                        businessData.contact.phone,
                         style: TextStyle(
                           fontSize: sh * 0.016,
                           fontFamily: 'Poppins-SemiBold',
@@ -405,7 +402,8 @@ class BusinessDetailScreen extends StatelessWidget {
             SizedBox(width: sw * 0.03),
             Expanded(
               child: GestureDetector(
-                onTap: () => UrlLauncherHelper.launchEmail(contact['email']),
+                onTap: () =>
+                    UrlLauncherHelper.launchEmail(businessData.contact.email),
                 child: Container(
                   padding: EdgeInsets.all(sw * 0.04),
                   decoration: BoxDecoration(
@@ -439,7 +437,7 @@ class BusinessDetailScreen extends StatelessWidget {
                       ),
                       SizedBox(height: sh * 0.008),
                       Text(
-                        contact['email'] ?? '',
+                        businessData.contact.email,
                         style: TextStyle(
                           fontSize: sh * 0.014,
                           fontFamily: 'Poppins-SemiBold',
@@ -458,10 +456,11 @@ class BusinessDetailScreen extends StatelessWidget {
         SizedBox(height: sh * 0.02),
         Row(
           children: [
-            if (contact['website'] != null) ...[
+            if (businessData.contact.website != null) ...[
               Expanded(
                 child: GestureDetector(
-                  onTap: () => UrlLauncherHelper.launchURL(contact['website']),
+                  onTap: () => UrlLauncherHelper.launchURL(
+                      businessData.contact.website!),
                   child: Container(
                     padding: EdgeInsets.all(sw * 0.04),
                     decoration: BoxDecoration(
@@ -496,7 +495,8 @@ class BusinessDetailScreen extends StatelessWidget {
                         ),
                         SizedBox(height: sh * 0.008),
                         Text(
-                          UrlLauncherHelper.formatURL(contact['website']),
+                          UrlLauncherHelper.formatURL(
+                              businessData.contact.website!),
                           style: TextStyle(
                             fontSize: sh * 0.014,
                             fontFamily: 'Poppins-SemiBold',
@@ -509,16 +509,14 @@ class BusinessDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              if (contact['socialMedia'] != null &&
-                  contact['socialMedia'].isNotEmpty)
+              if (businessData.contact.socialMedia.isNotEmpty)
                 SizedBox(width: sw * 0.03),
             ],
-            if (contact['socialMedia'] != null &&
-                contact['socialMedia'].isNotEmpty) ...[
+            if (businessData.contact.socialMedia.isNotEmpty) ...[
               Expanded(
                 child: GestureDetector(
                   onTap: () => UrlLauncherHelper.launchURL(
-                      contact['socialMedia'][0]['url']),
+                      businessData.contact.socialMedia.first.url),
                   child: Container(
                     padding: EdgeInsets.all(sw * 0.04),
                     decoration: BoxDecoration(
@@ -558,7 +556,7 @@ class BusinessDetailScreen extends StatelessWidget {
                         ),
                         SizedBox(height: sh * 0.008),
                         Text(
-                          contact['socialMedia'][0]['platform'] ?? '',
+                          businessData.contact.socialMedia.first.platform,
                           style: TextStyle(
                             fontSize: sh * 0.016,
                             fontFamily: 'Poppins-SemiBold',
@@ -578,8 +576,7 @@ class BusinessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryCard(
-      double sw, double sh, Map<String, dynamic> business) {
+  Widget _buildCategoryCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -641,7 +638,7 @@ class BusinessDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        business['category'] ?? '',
+                        businessData.category,
                         style: TextStyle(
                           fontSize: sh * 0.016,
                           fontFamily: 'Poppins-SemiBold',
@@ -679,7 +676,7 @@ class BusinessDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        business['subcategory'] ?? '',
+                        businessData.subcategory ?? 'N/A',
                         style: TextStyle(
                           fontSize: sh * 0.016,
                           fontFamily: 'Poppins-SemiBold',
@@ -698,10 +695,7 @@ class BusinessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLocationCard(
-      double sw, double sh, Map<String, dynamic> business) {
-    final location = business['location'];
-
+  Widget _buildLocationCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -748,7 +742,7 @@ class BusinessDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${location['address']}',
+                  businessData.location.address,
                   style: TextStyle(
                     fontSize: sh * 0.016,
                     fontFamily: 'Poppins-SemiBold',
@@ -757,7 +751,7 @@ class BusinessDetailScreen extends StatelessWidget {
                 ),
                 SizedBox(height: sh * 0.005),
                 Text(
-                  '${location['city']}, ${location['state']}',
+                  '${businessData.location.city}, ${businessData.location.state}',
                   style: TextStyle(
                     fontSize: sh * 0.014,
                     fontFamily: 'Poppins-Medium',
@@ -765,7 +759,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${location['country']} - ${location['postalCode'] ?? ''}',
+                  '${businessData.location.country}${businessData.location.postalCode != null ? ' - ${businessData.location.postalCode}' : ''}',
                   style: TextStyle(
                     fontSize: sh * 0.014,
                     fontFamily: 'Poppins-Medium',
@@ -780,9 +774,7 @@ class BusinessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHoursCard(double sw, double sh, Map<String, dynamic> business) {
-    final hours = business['hours'] as List<dynamic>? ?? [];
-
+  Widget _buildHoursCard(double sw, double sh) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(sw * 0.04),
@@ -817,7 +809,7 @@ class BusinessDetailScreen extends StatelessWidget {
             ],
           ),
           SizedBox(height: sh * 0.015),
-          ...hours.map((dayHour) {
+          ...businessData.hours.map((dayHour) {
             return Container(
               margin: EdgeInsets.only(bottom: sh * 0.01),
               padding: EdgeInsets.all(sw * 0.03),
@@ -834,15 +826,14 @@ class BusinessDetailScreen extends StatelessWidget {
                     width: sw * 0.02,
                     height: sw * 0.02,
                     decoration: BoxDecoration(
-                      color: dayHour['isClosed']
-                          ? Colors.red
-                          : Colors.cyan.shade600,
+                      color:
+                          dayHour.isClosed ? Colors.red : Colors.cyan.shade600,
                       shape: BoxShape.circle,
                     ),
                   ),
                   SizedBox(width: sw * 0.03),
                   Text(
-                    dayHour['day'],
+                    dayHour.day,
                     style: TextStyle(
                       fontSize: sh * 0.016,
                       fontFamily: 'Poppins-SemiBold',
@@ -854,15 +845,14 @@ class BusinessDetailScreen extends StatelessWidget {
                     padding: EdgeInsets.symmetric(
                         horizontal: sw * 0.02, vertical: sh * 0.005),
                     decoration: BoxDecoration(
-                      color: dayHour['isClosed']
-                          ? Colors.red
-                          : Colors.cyan.shade600,
+                      color:
+                          dayHour.isClosed ? Colors.red : Colors.cyan.shade600,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      dayHour['isClosed']
+                      dayHour.isClosed
                           ? 'CLOSED'
-                          : '${dayHour['openTime']} - ${dayHour['closeTime']}',
+                          : '${dayHour.openTime} - ${dayHour.closeTime}',
                       style: TextStyle(
                         fontSize: sh * 0.013,
                         fontFamily: 'Poppins-Medium',
@@ -879,54 +869,52 @@ class BusinessDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesAndRatingRow(
-      double sw, double sh, Map<String, dynamic> business) {
-    final features = business['features'] as List<dynamic>? ?? [];
-    final rating = business['rating'] ?? 0.0;
-
+  Widget _buildFeaturesAndRatingRow(double sw, double sh) {
     return Column(
       children: [
         // Rating Card
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(sw * 0.04),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.yellow.shade50, Colors.amber.shade50],
+        if (businessData.rating != null) ...[
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(sw * 0.04),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.yellow.shade50, Colors.amber.shade50],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.amber.shade300, width: 2),
             ),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.amber.shade300, width: 2),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.star, color: Colors.amber.shade700, size: sh * 0.03),
-              SizedBox(width: sw * 0.02),
-              Text(
-                rating.toString(),
-                style: TextStyle(
-                  fontSize: sh * 0.024,
-                  fontFamily: 'Poppins-Bold',
-                  color: Colors.amber.shade900,
-                  fontWeight: FontWeight.w700,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.star, color: Colors.amber.shade700, size: sh * 0.03),
+                SizedBox(width: sw * 0.02),
+                Text(
+                  businessData.rating.toString(),
+                  style: TextStyle(
+                    fontSize: sh * 0.024,
+                    fontFamily: 'Poppins-Bold',
+                    color: Colors.amber.shade900,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              SizedBox(width: sw * 0.02),
-              Text(
-                'RATING',
-                style: TextStyle(
-                  fontSize: sh * 0.014,
-                  fontFamily: 'Poppins-Bold',
-                  color: Colors.amber.shade800,
-                  letterSpacing: 0.5,
+                SizedBox(width: sw * 0.02),
+                Text(
+                  'RATING',
+                  style: TextStyle(
+                    fontSize: sh * 0.014,
+                    fontFamily: 'Poppins-Bold',
+                    color: Colors.amber.shade800,
+                    letterSpacing: 0.5,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-
-        if (features.isNotEmpty) ...[
           SizedBox(height: sh * 0.02),
+        ],
+
+        if (businessData.features.isNotEmpty) ...[
           // Features Card
           Container(
             width: double.infinity,
@@ -962,7 +950,7 @@ class BusinessDetailScreen extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: sh * 0.015),
-                ...features
+                ...businessData.features
                     .map((feature) => Container(
                           margin: EdgeInsets.only(bottom: sh * 0.01),
                           padding: EdgeInsets.all(sw * 0.03),
@@ -984,7 +972,7 @@ class BusinessDetailScreen extends StatelessWidget {
                               SizedBox(width: sw * 0.03),
                               Expanded(
                                 child: Text(
-                                  feature.toString(),
+                                  feature,
                                   style: TextStyle(
                                     fontSize: sh * 0.015,
                                     fontFamily: 'Poppins-Medium',

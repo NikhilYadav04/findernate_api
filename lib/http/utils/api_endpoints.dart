@@ -27,15 +27,20 @@ class ApiEndpoints {
 
   //* Post Creation Endpoints
   static String get createPost =>
-      '${ApiConfig.baseUrl}/api/v1/posts/create/normal';
+      '${ApiConfig.baseUrl2}/api/v1/posts/create/normal';
   static String get createBusinessPost =>
-      '${ApiConfig.baseUrl}/api/v1/posts/create/product';
+      '${ApiConfig.baseUrl2}/api/v1/posts/create/business';
   static String get createServicePost =>
-      '${ApiConfig.baseUrl}/api/v1/posts/create/service';
+      '${ApiConfig.baseUrl2}/api/v1/posts/create/service';
   static String get createProductPost =>
-      '${ApiConfig.baseUrl}/api/v1/posts/create/business';
+      '${ApiConfig.baseUrl2}/api/v1/posts/create/product';
 
   //* Home Feed
   static String get HomeFeedPosts =>
-      '${ApiConfig.baseUrl}/api/v1/posts/home-feed';
+      '${ApiConfig.baseUrl2}/api/v1/posts/home-feed';
+  
+
+  //* Profile
+  static String get CurrentUserPosts =>
+      '${ApiConfig.baseUrl2}/api/v1/posts/myPosts';
 }

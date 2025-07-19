@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_clone/http/models/posts/base_post_model.dart';
 
-Widget buildLikes(double sw, double sh, Map<String, dynamic> postData) {
-  final engagement = postData['data']['engagement'];
+Widget buildLikes(double sw, double sh, PostModel postData) {
+  final engagement = postData.engagement;
 
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (engagement['likes'] > 0)
+        if (engagement.likes >= 0)
           Text(
-            '${_formatCount(engagement['likes'])} likes',
+            '${_formatCount(engagement.likes)} likes',
             style: TextStyle(
               fontSize: sh * 0.016,
               fontFamily: 'Poppins-SemiBold',
@@ -27,8 +28,8 @@ Widget buildLikes(double sw, double sh, Map<String, dynamic> postData) {
 
 
 Widget buildCommentsShares(
-    double sw, double sh, Map<String, dynamic> postData) {
-  final engagement = postData['data']['engagement'];
+    double sw, double sh, PostModel postData) {
+  final engagement = postData.engagement;
 
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: sw * 0.04),
@@ -37,9 +38,9 @@ Widget buildCommentsShares(
       children: [
         Row(
           children: [
-            if (engagement['comments'] > 0) ...[
+            if (engagement.comments >= 0) ...[
               Text(
-                '${_formatCount(engagement['comments'])} comments',
+                '${_formatCount(engagement.comments)} comments',
                 style: TextStyle(
                   fontSize: sh * 0.014,
                   fontFamily: 'Poppins-Regular',
@@ -47,12 +48,12 @@ Widget buildCommentsShares(
                 ),
               ),
             ],
-            if (engagement['comments'] > 0 && engagement['shares'] > 0) ...[
+            if (engagement.comments >= 0 && engagement.shares >= 0) ...[
               Text(' • ', style: TextStyle(color: Colors.grey.shade600)),
             ],
-            if (engagement['shares'] > 0) ...[
+            if (engagement.shares >= 0) ...[
               Text(
-                '${_formatCount(engagement['shares'])} shares',
+                '${_formatCount(engagement.shares)} shares',
                 style: TextStyle(
                   fontSize: sh * 0.014,
                   fontFamily: 'Poppins-Regular',
@@ -62,7 +63,7 @@ Widget buildCommentsShares(
             ],
             Spacer(),
             Text(
-              _formatTimestamp(postData['data']['createdAt']),
+              _formatTimestamp(postData.createdAt.toIso8601String()),
               style: TextStyle(
                 fontSize: sh * 0.012,
                 fontFamily: 'Poppins-Regular',

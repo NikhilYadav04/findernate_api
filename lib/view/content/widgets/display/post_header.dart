@@ -1,21 +1,26 @@
 // universal_post_card.dart
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:logger/logger.dart';
 import 'package:social_media_clone/core/constants/appColors.dart';
+import 'package:social_media_clone/http/models/posts/base_post_model.dart';
 import 'package:social_media_clone/view/content/widgets/display/post_actions.dart';
 import 'package:social_media_clone/view/content/widgets/display/post_content.dart';
 import 'package:social_media_clone/view/content/widgets/display/post_engagement.dart';
 import 'package:social_media_clone/view/content/widgets/display/post_image.dart';
 import 'package:social_media_clone/view/content/widgets/display/post_tags.dart';
+import 'package:social_media_clone/view/content/widgets/display/post_video.dart';
 
 class UniversalPostCard extends StatefulWidget {
-  final Map<String, dynamic> postData;
+  final PostModel postData;
   final VoidCallback? onLike;
   final VoidCallback? onComment;
   final VoidCallback? onShare;
   final VoidCallback? onSave;
   final VoidCallback? onProfileTap;
+  final bool isReel;
 
   const UniversalPostCard({
     Key? key,
@@ -25,6 +30,7 @@ class UniversalPostCard extends StatefulWidget {
     this.onShare,
     this.onSave,
     this.onProfileTap,
+    required this.isReel,
   }) : super(key: key);
 
   @override
@@ -49,6 +55,7 @@ class _UniversalPostCardState extends State<UniversalPostCard>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
     );
+    Logger().d(widget.isReel);
   }
 
   @override
@@ -107,10 +114,12 @@ class _UniversalPostCardState extends State<UniversalPostCard>
           _buildHeader(sw, sh),
 
           //* Content Type Specific Info
-          buildContentTypeInfo(sw, sh,context, widget.postData),
+          buildContentTypeInfo(sw, sh, context, widget.postData),
 
           //* Post Image
-          buildPostImage(sw, sh, _handleDoubleTap, widget.postData),
+          widget.isReel
+              ? buildPostVideo(sw, sh, _handleDoubleTap, widget.postData)
+              : buildPostImage(sw, sh, _handleDoubleTap, widget.postData),
 
           //* Action Buttons
           _buildActions(sw, sh),
@@ -134,7 +143,7 @@ class _UniversalPostCardState extends State<UniversalPostCard>
   }
 
   Widget _buildHeader(double sw, double sh) {
-    final contentType = widget.postData['data']['contentType'];
+    final contentType = widget.postData.contentType;
     final location = _getLocationString();
 
     return Padding(
@@ -161,9 +170,31 @@ class _UniversalPostCardState extends State<UniversalPostCard>
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
-                child: CircleAvatar(
-                  backgroundColor: Colors.grey.shade300,
-                  child: Icon(Icons.person, color: Colors.grey.shade600),
+                child: ClipOval(
+                  child: CachedNetworkImage(
+                    imageUrl: widget.postData.userId.profileImageUrl ??
+                        'https://static.thenounproject.com/png/630737-200.png',
+                    width: sw * 0.12 - 8,
+                    height: sw * 0.12 - 8,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.shade300,
+                      ),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.appGradient1),
+                        ),
+                      ),
+                    ),
+                    errorWidget: (context, url, error) => CircleAvatar(
+                      backgroundColor: Colors.grey.shade300,
+                      child: Icon(Icons.person, color: Colors.grey.shade600),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -306,41 +337,36 @@ class _UniversalPostCardState extends State<UniversalPostCard>
   }
 
   String _getDisplayName() {
-    final contentType = widget.postData['data']['contentType'];
+    final contentType = widget.postData.contentType;
     switch (contentType) {
       case 'business':
-        return widget.postData['data']['customization']['business']
-                ['businessName'] ??
+        return widget.postData.customization.business?.businessName ??
             'Business';
       case 'service':
-        return widget.postData['data']['customization']['service']['name'] ??
+        return widget.postData.customization.service?.name ??
             'Service Provider';
       case 'product':
         return 'Product Store';
       default:
-        return 'User';
+        return widget.postData.userId.username;
     }
   }
 
   String _getLocationString() {
-    final contentType = widget.postData['data']['contentType'];
+    final contentType = widget.postData.contentType;
     switch (contentType) {
       case 'business':
-        final location =
-            widget.postData['data']['customization']['business']['location'];
-        return '${location['city']}, ${location['state']}';
+        final location = widget.postData.customization.business!.location;
+        return '${location.city}, ${location.state}';
       case 'service':
-        final location =
-            widget.postData['data']['customization']['service']['location'];
-        return '${location['city']}, ${location['state']}';
+        final location = widget.postData.customization.service!.location;
+        return '${location.city}, ${location.state}';
       case 'product':
-        final location =
-            widget.postData['data']['customization']['product']['location'];
-        return location['name'] ?? '';
+        final location = widget.postData.customization.normal?.location ;
+        return location?.name ?? '';
       case 'normal':
-        final location =
-            widget.postData['data']['customization']['normal']['location'];
-        return location['name'] ?? '';
+        final location = widget.postData.customization.normal!.location;
+        return location?.name ?? '';
       default:
         return '';
     }

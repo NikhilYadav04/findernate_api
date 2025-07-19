@@ -10,6 +10,7 @@ import 'package:social_media_clone/http/services/post_services.dart';
 import 'package:social_media_clone/view/content/widgets/add/hashtag_card.dart';
 import 'package:social_media_clone/view/content/widgets/add/post-add_widgets.dart';
 import 'package:social_media_clone/view/content/widgets/add/reel_add_widgets.dart';
+import 'package:video_player/video_player.dart';
 
 // NORMAL POST SCREEN
 class NormalPostScreen extends StatefulWidget {
@@ -44,6 +45,8 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
   String selectedActivity = 'Relaxing';
   bool _isLoading = false;
 
+  late double duration;
+
   // Hashtags and category
   List<String> hashtags = [];
   String selectedPostCategory = 'Personal Life';
@@ -77,6 +80,22 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
         return;
       }
 
+      String postType = "photo";
+
+      if (widget.isReel) {
+        final VideoPlayerController videoController =
+            VideoPlayerController.file(mediaFile);
+        await videoController.initialize();
+        final Duration duration = videoController.value.duration;
+        await videoController.dispose();
+
+        if (duration.inSeconds <= 60) {
+          postType = "reel";
+        } else {
+          postType = "video";
+        }
+      }
+
       // Prepare location data
       Map<String, String> locationData = {
         "name": locationController.text.trim().isEmpty
@@ -97,7 +116,7 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
       // Make API call
       final response = await _postService.createNormalPost(
         media: mediaFile,
-        postType: widget.isReel ? "reel" : "photo",
+        postType: postType,
         caption: captionController.text.isEmpty
             ? ""
             : captionController.text.toString(),
@@ -112,6 +131,8 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
         settings: settingsData,
         status: "published",
       );
+
+      Logger().d('Post type os ${postType}');
 
       setState(() {
         _isLoading = false;
@@ -219,7 +240,7 @@ class _NormalPostScreenState extends State<NormalPostScreen> {
                 ? VideoPickerWidget(
                     sw: sw,
                     sh: sh,
-                    selectedVideo: selectedImage,
+                    selectedVideo: selectedVideo,
                     onTap: _pickVideo)
                 : PostAddWidgets.buildImagePicker(
                     sw, sh, selectedImage, _pickImage),

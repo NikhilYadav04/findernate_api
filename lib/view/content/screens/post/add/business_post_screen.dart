@@ -51,7 +51,10 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
       TextEditingController();
   final TextEditingController promotionValidUntilController =
       TextEditingController();
+  final TextEditingController linkController = TextEditingController();
   bool isPromotionActive = true;
+
+  String date = DateTime.now().toIso8601String();
 
   // Hashtags and category
   List<String> hashtags = [];
@@ -93,9 +96,10 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
         "businessName": businessNameController.text.trim().isEmpty
             ? "Unknown Business"
             : businessNameController.text.trim(),
-        "businessType": "",
-        "description": "",
-        "category": "",
+        "businessType": "Café",
+        "description":
+            "We serve freshly brewed coffee, handcrafted beverages, and delicious pastries in a cozy, welcoming space. Perfect for casual hangouts, work, or a quick caffeine fix!",
+        "category": "Food & Beverages",
         "contact": {
           "phone": "+91-9876543210",
           "email": "info@urbancafe.com",
@@ -108,12 +112,12 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
           ]
         },
         "location": {
-          "address": "",
-          "place": "",
-          "city": "",
-          "state": "",
-          "country": "",
-          "postalCode": ""
+          "address": "123 Brew Street",
+          "place": "Caffeine Corner",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "country": "India",
+          "postalCode": "411001"
         },
         "hours": [
           {
@@ -159,8 +163,8 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
             "isClosed": false
           }
         ],
-        "features": [],
-        "priceRange": "",
+        "features": ["Free Wifi", "Couples Entry Only"],
+        "priceRange": "200-300",
         "rating": 4.5,
         "tags": hashtags,
         "announcement": announcementController.text.trim(),
@@ -171,10 +175,11 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
             "discount": promotionDiscountController.text.trim().isEmpty
                 ? "0"
                 : double.parse(promotionDiscountController.text.trim()),
-            "validUntil": promotionValidUntilController.text.trim(),
+            "validUntil":date,
             "isActive": isPromotionActive
           }
-        ]
+        ],
+        "link": linkController.text.trim()
       };
 
       Map<String, dynamic> settingsData = {
@@ -328,7 +333,7 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
                 ? VideoPickerWidget(
                     sw: sw,
                     sh: sh,
-                    selectedVideo: selectedImage,
+                    selectedVideo: selectedVideo,
                     onTap: _pickVideo)
                 : PostAddWidgets.buildImagePicker(
                     sw, sh, selectedImage, _pickImage),
@@ -385,18 +390,7 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
                       size: 35,
                     ),
                   )
-                : PostAddWidgets.buildCreateButton(sw, sh, () {
-                    Logger().d("Promotion Data:");
-                    Logger()
-                        .d("  Title: ${promotionTitleController.text.trim()}");
-                    print(
-                        "  Description: ${promotionDescriptionController.text.trim()}");
-                    print(
-                        "  Discount: ${promotionDiscountController.text.trim().isEmpty ? "0" : double.parse(promotionDiscountController.text.trim())}");
-                    Logger().d(
-                        "  Valid Until: ${promotionValidUntilController.text.trim()}");
-                    Logger().d("  Is Active: $isPromotionActive");
-                  }),
+                : PostAddWidgets.buildCreateButton(sw, sh, _handleBusinessPost),
 
             SizedBox(height: sh * 0.03),
           ],
@@ -460,6 +454,16 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
 
           // Promotions Field (Similar to announcement but different styling)
           _buildPromotionsField(sw, sh),
+
+          //* Link FIeld
+          SizedBox(height: sh * 0.015),
+          PostAddWidgets.buildTextField(
+            linkController,
+            'Enter your business link...',
+            sw,
+            sh,
+            label: 'Link',
+          ),
         ],
       ),
     );
@@ -819,6 +823,9 @@ class _BusinessPostScreenState extends State<BusinessPostScreen> {
         );
       },
     );
+    setState(() {
+      date = picked!.toIso8601String();
+    });
     if (picked != null) {
       controller.text = "${picked.day}/${picked.month}/${picked.year}";
     }

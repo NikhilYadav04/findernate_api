@@ -69,15 +69,17 @@ class _CreatePostScreenState extends State<CreatePostScreen>
         centerTitle: true,
       ),
       body: Container(
+        
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.appGradient1.withOpacity(0.05),
-              AppColors.appGradient2.withOpacity(0.05)
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+          color: Colors.white
+          // gradient: LinearGradient(
+          //   colors: [
+          //     AppColors.appGradient1.withOpacity(0.05),
+          //     AppColors.appGradient2.withOpacity(0.05)
+          //   ],
+          //   begin: Alignment.topCenter,
+          //   end: Alignment.bottomCenter,
+          // ),
         ),
         child: Padding(
           padding: EdgeInsets.all(sw * 0.04),

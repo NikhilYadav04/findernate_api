@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:social_media_clone/http/models/posts/base_post_model.dart';
 
-Widget buildContent(double sw, double sh, Map<String, dynamic> postData,
+Widget buildContent(double sw, double sh, PostModel postData,
     String getDisplayName) {
-  final caption = postData['data']['caption'] ?? '';
-  final description = postData['data']['description'] ?? '';
+  final caption = postData.caption;
+  final description = postData.description ?? '';
 
   return Padding(
     padding: EdgeInsets.symmetric(horizontal: sw * 0.04),

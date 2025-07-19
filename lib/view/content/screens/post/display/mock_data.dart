@@ -1,5 +1,5 @@
 class MockData {
-  // Normal Posts (2)
+  //* Normal Posts (2)
   static const Map<String, dynamic> normalPost1 = {
     "statusCode": 201,
     "data": {
@@ -11,8 +11,10 @@ class MockData {
       "mentions": ["686f86a232ff68d345b72ea9"],
       "media": {
         "type": "image",
-        "url":
-            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
+        "url": [
+          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
+          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
+        ],
         "thumbnailUrl":
             "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
         "duration": null,
@@ -80,10 +82,11 @@ class MockData {
       "mentions": ["686f86a232ff68d345b72ea9"],
       "media": {
         "type": "image",
-        "url":
-            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
+        "url": [
+          "https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fvideo%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.jpg?alt=media&token=2a8b403c-cef5-461c-8ae8-ebe7a3b312e9"
+        ],
         "thumbnailUrl":
-            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
+            "https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fthumbnail%2Fdata%2Fuser%2F0%2Fcom.example.social_media_clone%2Fcache%2Fposts%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82%252FpfHY6orlWVKTYRhT91a5%252Fvideo%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.png?alt=media&token=7af15e22-3008-4fd1-9f8f-90ce84c8606e",
         "duration": null,
         "dimensions": {"width": 1916, "height": 985},
         "fileSize": 788038,
@@ -138,7 +141,7 @@ class MockData {
     "success": true
   };
 
-  // Business Posts (2)
+  //* Business Posts (2)
   static const Map<String, dynamic> businessPost1 = {
     "statusCode": 201,
     "data": {
@@ -152,8 +155,9 @@ class MockData {
       "mentions": ["686f86a232ff68d345b72ea9"],
       "media": {
         "type": "image",
-        "url":
-            "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=800&fit=crop",
+        "url": [
+          "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=800&fit=crop"
+        ],
         "thumbnailUrl":
             "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=800&fit=crop",
         "duration": null,
@@ -263,10 +267,11 @@ class MockData {
       "mentions": ["686f86a232ff68d345b72ea9"],
       "media": {
         "type": "image",
-        "url":
-            "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=800&fit=crop",
+        "url": [
+          "https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fvideo%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.jpg?alt=media&token=2a8b403c-cef5-461c-8ae8-ebe7a3b312e9"
+        ],
         "thumbnailUrl":
-            "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=800&fit=crop",
+            "https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fthumbnail%2Fdata%2Fuser%2F0%2Fcom.example.social_media_clone%2Fcache%2Fposts%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82%252FpfHY6orlWVKTYRhT91a5%252Fvideo%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.png?alt=media&token=7af15e22-3008-4fd1-9f8f-90ce84c8606e",
         "duration": null,
         "dimensions": {"width": 1918, "height": 998},
         "fileSize": 406976,
@@ -360,7 +365,7 @@ class MockData {
     "message": "Business post created successfully",
     "success": true
   };
-  // Service Posts (2)
+  //* Service Posts (2)
   static const Map<String, dynamic> servicePost1 = {
     "statusCode": 201,
     "data": {
@@ -373,8 +378,10 @@ class MockData {
       "mentions": ["686f86a232ff68d345b72ea9"],
       "media": {
         "type": "image",
-        "url":
-            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=800&fit=crop",
+        "url": [
+          "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=800&fit=crop",
+          "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=800&fit=crop",
+        ],
         "thumbnailUrl":
             "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=800&fit=crop",
         "duration": null,
@@ -469,9 +476,9 @@ class MockData {
       "media": {
         "type": "image",
         "url":
-            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=800&fit=crop",
+            ["https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fvideo%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.jpg?alt=media&token=2a8b403c-cef5-461c-8ae8-ebe7a3b312e9"],
         "thumbnailUrl":
-            "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=800&fit=crop",
+            "https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fthumbnail%2Fdata%2Fuser%2F0%2Fcom.example.social_media_clone%2Fcache%2Fposts%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82%252FpfHY6orlWVKTYRhT91a5%252Fvideo%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.png?alt=media&token=7af15e22-3008-4fd1-9f8f-90ce84c8606e",
         "duration": null,
         "dimensions": {"width": 1918, "height": 998},
         "fileSize": 406976,
@@ -551,7 +558,7 @@ class MockData {
     "success": true
   };
 
-  // Product Posts (2)
+  //* Product Posts (2)
   static const Map<String, dynamic> productPost1 = {
     "statusCode": 201,
     "data": {
@@ -566,7 +573,7 @@ class MockData {
       "media": {
         "type": "image",
         "url":
-            "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop",
+            ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop"],
         "thumbnailUrl":
             "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop",
         "duration": null,
@@ -637,9 +644,9 @@ class MockData {
       "media": {
         "type": "image",
         "url":
-            "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop",
+            ["https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fvideo%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.jpg?alt=media&token=2a8b403c-cef5-461c-8ae8-ebe7a3b312e9"],
         "thumbnailUrl":
-            "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=800&fit=crop",
+            "https://firebasestorage.googleapis.com/v0/b/findernate-2d4b3.firebasestorage.app/o/posts%2Fid2PbIOhkmQwBDxUxJ3onnU1oo82%2FpfHY6orlWVKTYRhT91a5%2Fthumbnail%2Fdata%2Fuser%2F0%2Fcom.example.social_media_clone%2Fcache%2Fposts%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82%252FpfHY6orlWVKTYRhT91a5%252Fvideo%252Fid2PbIOhkmQwBDxUxJ3onnU1oo82_1751794287360.png?alt=media&token=7af15e22-3008-4fd1-9f8f-90ce84c8606e",
         "duration": null,
         "dimensions": {"width": 1914, "height": 1002},
         "fileSize": 213652,
@@ -695,7 +702,7 @@ class MockData {
     "success": true
   };
 
-  // Get all 8 posts as a list (2 of each type)
+  //* Get all 8 posts as a list (2 of each type)
   static List<Map<String, dynamic>> get all8Posts => [
         normalPost1, // Normal
         normalPost2, // Normal

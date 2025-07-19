@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:social_media_clone/http/models/posts/base_post_model.dart';
 import 'package:social_media_clone/view/content/screens/post/display/business_detail_card.dart';
 import 'package:social_media_clone/view/content/screens/post/display/service_detail_card.dart';
 
 Widget buildContentTypeInfo(
-    double sw, double sh, BuildContext context, Map<String, dynamic> postData) {
-  final contentType = postData['data']['contentType'];
+    double sw, double sh, BuildContext context, PostModel postData) {
+  final contentType = postData.contentType;
 
   switch (contentType) {
     case 'business':
@@ -20,20 +21,16 @@ Widget buildContentTypeInfo(
 }
 
 Widget _buildBusinessInfo(
-    double sw, double sh, BuildContext context, Map<String, dynamic> postData) {
-  final businessData = postData['data']['customization']['business'];
+    double sw, double sh, BuildContext context, PostModel postData) {
+  final businessData = postData.customization.business;
 
   return GestureDetector(
     onTap: () {
-      print(businessData);
-      Map<String, dynamic> wrappedServiceData = {
-        'customization': {'business': businessData}
-      };
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) =>
-              BusinessDetailScreen(businessData: wrappedServiceData),
+              BusinessDetailScreen(businessData: businessData!),
         ),
       );
     },
@@ -60,7 +57,7 @@ Widget _buildBusinessInfo(
               SizedBox(width: sw * 0.02),
               Expanded(
                 child: Text(
-                  businessData['businessName'] ?? '',
+                  businessData?.businessName ?? 'Business',
                   style: TextStyle(
                     fontSize: sh * 0.016,
                     fontFamily: 'Poppins-SemiBold',
@@ -69,7 +66,7 @@ Widget _buildBusinessInfo(
                 ),
               ),
               Text(
-                businessData['priceRange'] ?? '',
+                businessData?.priceRange ?? 'Rs.',
                 style: TextStyle(
                   fontSize: sh * 0.014,
                   fontFamily: 'Poppins-Medium',
@@ -80,8 +77,8 @@ Widget _buildBusinessInfo(
           ),
 
           // HIGHLIGHTED: Announcement Section
-          if (businessData['announcement'] != null &&
-              businessData['announcement'].isNotEmpty) ...[
+          if (businessData?.announcement != null &&
+              businessData!.announcement!.isNotEmpty) ...[
             SizedBox(height: sh * 0.01),
             Container(
               width: double.infinity,
@@ -124,7 +121,7 @@ Widget _buildBusinessInfo(
                   ),
                   SizedBox(height: sh * 0.005),
                   Text(
-                    businessData['announcement'],
+                    businessData?.announcement ?? '',
                     style: TextStyle(
                       fontSize: sh * 0.014,
                       fontFamily: 'Poppins-Medium',
@@ -138,8 +135,8 @@ Widget _buildBusinessInfo(
           ],
 
           // HIGHLIGHTED: Promotions Section
-          if (businessData['promotions'] != null &&
-              businessData['promotions'].isNotEmpty) ...[
+          if (businessData?.promotions != null &&
+              businessData!.promotions.isNotEmpty) ...[
             SizedBox(height: sh * 0.01),
             Container(
               width: double.infinity,
@@ -187,7 +184,7 @@ Widget _buildBusinessInfo(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '${businessData['promotions'][0]['discount']}% OFF',
+                          '${businessData.promotions[0].discount}% OFF',
                           style: TextStyle(
                             fontSize: sh * 0.011,
                             fontFamily: 'Poppins-Bold',
@@ -199,7 +196,7 @@ Widget _buildBusinessInfo(
                   ),
                   SizedBox(height: sh * 0.005),
                   Text(
-                    businessData['promotions'][0]['title'] ?? '',
+                    businessData.promotions[0].title,
                     style: TextStyle(
                       fontSize: sh * 0.015,
                       fontFamily: 'Poppins-SemiBold',
@@ -207,17 +204,15 @@ Widget _buildBusinessInfo(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  if (businessData['promotions'][0]['description'] != null) ...[
-                    SizedBox(height: sh * 0.003),
-                    Text(
-                      businessData['promotions'][0]['description'],
-                      style: TextStyle(
-                        fontSize: sh * 0.013,
-                        fontFamily: 'Poppins-Medium',
-                        color: Colors.red.shade800,
-                      ),
+                  SizedBox(height: sh * 0.003),
+                  Text(
+                    businessData.promotions[0].description,
+                    style: TextStyle(
+                      fontSize: sh * 0.013,
+                      fontFamily: 'Poppins-Medium',
+                      color: Colors.red.shade800,
                     ),
-                  ],
+                  ),
                 ],
               ),
             ),
@@ -229,20 +224,17 @@ Widget _buildBusinessInfo(
 }
 
 Widget _buildServiceInfo(
-    double sw, double sh, BuildContext context, Map<String, dynamic> postData) {
-  final serviceData = postData['data']['customization']['service'];
+    double sw, double sh, BuildContext context, PostModel postData) {
+  final serviceData = postData.customization.service;
 
   return GestureDetector(
     onTap: () {
-      Logger().d(serviceData);
-      Map<String, dynamic> wrappedServiceData = {
-        'customization': {'service': serviceData}
-      };
+     
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) =>
-              ServiceDetailScreen(serviceData: wrappedServiceData),
+              ServiceDetailScreen(serviceData: serviceData),
         ),
       );
     },
@@ -284,7 +276,7 @@ Widget _buildServiceInfo(
                 SizedBox(width: sw * 0.02),
                 Expanded(
                   child: Text(
-                    serviceData['name'] ?? '',
+                    serviceData?.name ?? '',
                     style: TextStyle(
                       fontSize: sh * 0.018,
                       fontFamily: 'Poppins-Bold',
@@ -331,7 +323,7 @@ Widget _buildServiceInfo(
                     ),
                     Spacer(),
                     Text(
-                      '${serviceData['location']['city']}, ${serviceData['location']['state']}',
+                      '${serviceData!.location.city}, ${serviceData!.location.state}',
                       style: TextStyle(
                         fontSize: sh * 0.014,
                         fontFamily: 'Poppins-SemiBold',
@@ -359,7 +351,7 @@ Widget _buildServiceInfo(
                     ),
                     Spacer(),
                     Text(
-                      '${serviceData['currency']} ${serviceData['price']}',
+                      '${serviceData.currency} ${serviceData.price}',
                       style: TextStyle(
                         fontSize: sh * 0.016,
                         fontFamily: 'Poppins-Bold',
@@ -382,7 +374,7 @@ Widget _buildServiceInfo(
                   color: Colors.grey.shade600, size: sh * 0.015),
               SizedBox(width: sw * 0.01),
               Text(
-                '${serviceData['duration']} min',
+                '${serviceData.duration} min',
                 style: TextStyle(
                   fontSize: sh * 0.013,
                   fontFamily: 'Poppins-Regular',
@@ -393,7 +385,7 @@ Widget _buildServiceInfo(
               Icon(Icons.person, color: Colors.grey.shade600, size: sh * 0.015),
               SizedBox(width: sw * 0.01),
               Text(
-                serviceData['serviceType'] ?? '',
+                serviceData.serviceType,
                 style: TextStyle(
                   fontSize: sh * 0.013,
                   fontFamily: 'Poppins-Regular',
@@ -408,9 +400,8 @@ Widget _buildServiceInfo(
   );
 }
 
-Widget _buildProductInfo(double sw, double sh, Map<String, dynamic> postData) {
-  final productData = postData['data']['customization']['product'];
-  final description = postData['data']['description'] ?? '';
+Widget _buildProductInfo(double sw, double sh, PostModel postData) {
+  final productData = postData.customization.product;
 
   return Container(
     margin: EdgeInsets.only(
@@ -450,7 +441,7 @@ Widget _buildProductInfo(double sw, double sh, Map<String, dynamic> postData) {
               SizedBox(width: sw * 0.02),
               Expanded(
                 child: Text(
-                  _getProductNameFromDescription(description),
+                  productData?.name ?? "New Product",
                   style: TextStyle(
                     fontSize: sh * 0.018,
                     fontFamily: 'Poppins-Bold',
@@ -465,50 +456,50 @@ Widget _buildProductInfo(double sw, double sh, Map<String, dynamic> postData) {
 
         SizedBox(height: sh * 0.01),
 
-        // HIGHLIGHTED: Product Price (if available)
-        if (_getProductPriceFromDescription(description).isNotEmpty) ...[
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(sw * 0.025),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.green.shade100,
-                  Colors.teal.shade100,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green.shade300, width: 2),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.currency_rupee,
-                    color: Colors.green.shade700, size: sh * 0.020),
-                SizedBox(width: sw * 0.015),
-                Text(
-                  'PRICE',
-                  style: TextStyle(
-                    fontSize: sh * 0.012,
-                    fontFamily: 'Poppins-Bold',
-                    color: Colors.green.shade800,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                Spacer(),
-                Text(
-                  _getProductPriceFromDescription(description),
-                  style: TextStyle(
-                    fontSize: sh * 0.018,
-                    fontFamily: 'Poppins-Bold',
-                    color: Colors.green.shade900,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: sh * 0.01),
-        ],
+        // // HIGHLIGHTED: Product Price (if available)
+        // if (_getProductPriceFromDescription(description).isNotEmpty) ...[
+        //   Container(
+        //     width: double.infinity,
+        //     padding: EdgeInsets.all(sw * 0.025),
+        //     decoration: BoxDecoration(
+        //       gradient: LinearGradient(
+        //         colors: [
+        //           Colors.green.shade100,
+        //           Colors.teal.shade100,
+        //         ],
+        //       ),
+        //       borderRadius: BorderRadius.circular(8),
+        //       border: Border.all(color: Colors.green.shade300, width: 2),
+        //     ),
+        //     child: Row(
+        //       children: [
+        //         Icon(Icons.currency_rupee,
+        //             color: Colors.green.shade700, size: sh * 0.020),
+        //         SizedBox(width: sw * 0.015),
+        //         Text(
+        //           'PRICE',
+        //           style: TextStyle(
+        //             fontSize: sh * 0.012,
+        //             fontFamily: 'Poppins-Bold',
+        //             color: Colors.green.shade800,
+        //             letterSpacing: 0.5,
+        //           ),
+        //         ),
+        //         Spacer(),
+        //         Text(
+        //           _getProductPriceFromDescription(description),
+        //           style: TextStyle(
+        //             fontSize: sh * 0.018,
+        //             fontFamily: 'Poppins-Bold',
+        //             color: Colors.green.shade900,
+        //             fontWeight: FontWeight.w700,
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        //   SizedBox(height: sh * 0.01),
+        // ],
 
         // HIGHLIGHTED: Location & Shop Now
         Container(
@@ -549,7 +540,8 @@ Widget _buildProductInfo(double sw, double sh, Map<String, dynamic> postData) {
               Container(
                 width: double.infinity,
                 child: Text(
-                  productData['location']['name'] ?? 'Available Online',
+                  postData.customization.normal?.location?.name ??
+                      'Available Online',
                   style: TextStyle(
                     fontSize: sh * 0.014,
                     fontFamily: 'Poppins-SemiBold',
@@ -625,23 +617,4 @@ Widget _buildProductInfo(double sw, double sh, Map<String, dynamic> postData) {
       ],
     ),
   );
-}
-
-String _getProductNameFromDescription(String description) {
-  if (description.toLowerCase().contains('t-shirt')) {
-    return 'Cool T-Shirt';
-  } else if (description.toLowerCase().contains('shirt')) {
-    return 'New Shirt Collection';
-  } else {
-    return 'New Product Launch';
-  }
-}
-
-String _getProductPriceFromDescription(String description) {
-  if (description.toLowerCase().contains('999')) {
-    return '₹999';
-  } else if (description.toLowerCase().contains('price')) {
-    return '₹799';
-  }
-  return '';
 }

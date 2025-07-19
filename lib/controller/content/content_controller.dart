@@ -1,91 +1,172 @@
-import 'package:flutter/material.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:social_media_clone/http/models/api_reponse.dart';
+import 'package:social_media_clone/http/models/posts/base_post_model.dart';
+import 'package:social_media_clone/http/services/post_services.dart';
 
-class ProviderContent extends ChangeNotifier {
-  // ========================================
-  // POST SECTION
-  // ========================================
+class ContentProvider extends ChangeNotifier {
+  //* -----------------------------------------------------------------------------
+  //* Current Users Posts
+  //* -----------------------------------------------------------------------------
+  final PostService _postService = PostService();
 
-  //* Post Controllers and Form Keys
-  final GlobalKey<FormState> postCaptionKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> postHashTagKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> postLocationKey = GlobalKey<FormState>();
+  List<PostModel> _photoPosts = [];
+  List<PostModel> _videoPosts = [];
+  List<PostModel> _reelPosts = [];
 
-  final TextEditingController postCaptionController = TextEditingController();
-  final TextEditingController postHashtagController = TextEditingController();
-  final TextEditingController postLocationController = TextEditingController();
-  final TextEditingController postTypeController = TextEditingController();
+  bool _isLoadingPhoto = false;
+  bool _isLoadingVideo = false;
+  bool _isLoadingReel = false;
 
-  //* Post Variables
-  List<File>? imageFiles = [];
+  bool _hasMorePhoto = false;
+  bool _hasMoreVideo = false;
+  bool _hasMoreReel = false;
 
-  //* Post Utils
-  Future<void> pickImageFromGallery(List<File>? images) async {
-    if (images != null && images.isNotEmpty) {
-      imageFiles = images;
-      notifyListeners();
+  bool _initializePhoto = false;
+  bool _initializeVideo = false;
+  bool _initializeReel = false;
+
+  bool get initializePhoto => _initializePhoto;
+  bool get initializeVideo => _initializeVideo;
+  bool get initializeReel => _initializeReel;
+
+  bool get isLoadingPhoto => _isLoadingPhoto;
+  bool get isLoadingVideo => _isLoadingVideo;
+  bool get isLoadingReel => _isLoadingReel;
+
+  List<PostModel> get photoPosts => _photoPosts;
+  List<PostModel> get videoPosts => _videoPosts;
+  List<PostModel> get reelPosts => _reelPosts;
+
+  int _limit = 5;
+  int get limit => _limit;
+
+  int _pagePhoto = 1;
+  int _pageVideo = 1;
+  int _pageReel = 1;
+
+  //* Fetch current user's photo posts with pagination
+  void fetchCurrentUserPhotoPosts() async {
+    if (_isLoadingPhoto || !_hasMorePhoto) return;
+
+    if (_photoPosts.isEmpty) {
+      _initializePhoto = true;
     }
-  }
 
-  //* Post Validation
-  final Map<String, bool> _postFieldErrors = {};
-
-  bool hasPostError(String field) => _postFieldErrors[field] ?? false;
-
-  void setPostFieldError(String field, bool value) {
-    if (_postFieldErrors[field] != value) {
-      _postFieldErrors[field] = value;
-      notifyListeners();
-    }
-  }
-
-  void clearPostFieldError() {
-    _postFieldErrors.clear();
+    _isLoadingPhoto = true;
     notifyListeners();
-  }
 
-  bool get hasAnyPostError => _postFieldErrors.values.any((e) => e);
+    try {
+      ApiResponse<Map<String, dynamic>> response =
+          await _postService.getCurrentUserPosts(
+              postType: "photo", page: _pagePhoto, limit: _limit);
 
-  // ========================================
-  // REEL SECTION
-  // ========================================
+      final data = response.data!;
+      final rawPosts = data['posts'] as List<dynamic>?;
 
-  //* Reel Controllers and Form Keys
-  final GlobalKey<FormState> reelCaptionKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> reelHashTagKey = GlobalKey<FormState>();
-  final GlobalKey<FormState> reelLocationKey = GlobalKey<FormState>();
+      final newPosts = rawPosts != null
+          ? rawPosts.map((json) => PostModel.fromJson(json)).toList()
+          : <PostModel>[];
 
-  final TextEditingController reelCaptionController = TextEditingController();
-  final TextEditingController reelHashtagController = TextEditingController();
-  final TextEditingController reelLocationController = TextEditingController();
+      if (newPosts.isEmpty) {
+        _hasMorePhoto = false;
+      } else {
+        _photoPosts.addAll(newPosts);
+        _pagePhoto++;
 
-  //* Reel Variables
-  File? videoFile;
-
-  //* Reel Utils
-  Future<void> pickReelVideo(File? video) async {
-    if (video != null) {
-      videoFile = video;
+        if (newPosts.length < _limit) {
+          _hasMorePhoto = false;
+        }
+      }
+    } catch (e) {
+      // Handle error (logging, UI feedback, etc.)
+    } finally {
+      _isLoadingPhoto = false;
+      _initializePhoto = false;
       notifyListeners();
     }
   }
 
-  //* Reel Validation
-  final Map<String, bool> _reelFieldErrors = {};
+  //* Fetch current user's video posts with pagination
+  void fetchCurrentUserVideoPosts() async {
+    if (_isLoadingVideo || !_hasMoreVideo) return;
 
-  bool hasReelError(String field) => _reelFieldErrors[field] ?? false;
-
-  void setReelFieldError(String field, bool value) {
-    if (_reelFieldErrors[field] != value) {
-      _reelFieldErrors[field] = value;
-      notifyListeners();
+    if (_videoPosts.isEmpty) {
+      _initializeVideo = true;
     }
-  }
 
-  void clearReelFieldError() {
-    _reelFieldErrors.clear();
+    _isLoadingVideo = true;
     notifyListeners();
+
+    try {
+      ApiResponse<Map<String, dynamic>> response =
+          await _postService.getCurrentUserPosts(
+              postType: "video", page: _pageVideo, limit: _limit);
+
+      final data = response.data!;
+      final rawPosts = data['posts'] as List<dynamic>?;
+
+      final newPosts = rawPosts != null
+          ? rawPosts.map((json) => PostModel.fromJson(json)).toList()
+          : <PostModel>[];
+
+      if (newPosts.isEmpty) {
+        _hasMoreVideo = false;
+      } else {
+        _videoPosts.addAll(newPosts);
+        _pageVideo++;
+
+        if (newPosts.length < _limit) {
+          _hasMoreVideo = false;
+        }
+      }
+    } catch (e) {
+      // Handle error
+    } finally {
+      _isLoadingVideo = false;
+      _initializeVideo = false;
+      notifyListeners();
+    }
   }
 
-  bool get hasAnyReelError => _reelFieldErrors.values.any((e) => e);
+  //* Fetch current user's reels with pagination
+  void fetchCurrentUserReelPosts() async {
+    if (_isLoadingReel || !_hasMoreReel) return;
+
+    if (_reelPosts.isEmpty) {
+      _initializeReel = true;
+    }
+
+    _isLoadingReel = true;
+    notifyListeners();
+
+    try {
+      ApiResponse<Map<String, dynamic>> response =
+          await _postService.getCurrentUserPosts(
+              postType: "reel", page: _pageReel, limit: _limit);
+
+      final data = response.data!;
+      final rawPosts = data['posts'] as List<dynamic>?;
+
+      final newPosts = rawPosts != null
+          ? rawPosts.map((json) => PostModel.fromJson(json)).toList()
+          : <PostModel>[];
+
+      if (newPosts.isEmpty) {
+        _hasMoreReel = false;
+      } else {
+        _reelPosts.addAll(newPosts);
+        _pageReel++;
+
+        if (newPosts.length < _limit) {
+          _hasMoreReel = false;
+        }
+      }
+    } catch (e) {
+      // Handle error
+    } finally {
+      _isLoadingReel = false;
+      _initializeReel = false;
+      notifyListeners();
+    }
+  }
 }

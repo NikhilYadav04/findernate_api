@@ -8,7 +8,8 @@ Widget homeAppBar(
     {required String unreadCount,
     required double maxHeight,
     required double maxWidth,
-    required VoidCallback onTap,
+    required VoidCallback onTap1,
+    required VoidCallback onTap2,
     required BuildContext context}) {
   return Container(
     color: Colors.white,
@@ -19,10 +20,13 @@ Widget homeAppBar(
       children: [
         Expanded(
           flex: 1,
-          child: Image.asset(
-            AppImages.appBarLogo,
-            scale: 0.8,
-            color: Color.fromARGB(255, 228, 167, 76),
+          child: GestureDetector(
+            onTap: onTap1,
+            child: Image.asset(
+              AppImages.appBarLogo,
+              scale: 0.8,
+              color: Color.fromARGB(255, 228, 167, 76),
+            ),
           ),
         ),
         Expanded(
@@ -40,7 +44,7 @@ Widget homeAppBar(
               ),
               //* Nav to Messages Page
               GestureDetector(
-                onTap: onTap,
+                onTap: onTap2,
                 child: badgeWidget(unreadCount, "assets/images/svg/ic_chat.svg",
                     maxHeight, maxWidth),
               )

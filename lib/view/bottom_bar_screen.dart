@@ -6,6 +6,7 @@ import 'package:social_media_clone/core/router/appRouter.dart';
 import 'package:social_media_clone/view/bottom_bar_widgets.dart';
 import 'package:social_media_clone/view/home/screen/home_screen.dart';
 import 'package:social_media_clone/view/profile/screen/profile_screen.dart';
+import 'package:social_media_clone/view/search/screen/search_screen.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -409,12 +410,9 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           child: IndexedStack(
             index: _currentIndex,
             children: [
-              HomeScreen(),
-              Container(
-                child: Center(
-                  child: Text("Search Screen"),
-                ),
-              ),
+             HomeScreen(),
+             // SearchScreen(),
+              SearchScreen(),
               Container(
                 child: Center(
                   child: Text("Reels Screen"),
